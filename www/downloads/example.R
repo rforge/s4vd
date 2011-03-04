@@ -18,12 +18,12 @@ ressim <- BiclustResult(params,RowxNumber,NumberxCol,Number,info)
 #perform s4vd biclustering 
 system.time(
 ress4vd <- s4vd(X,pcerv=0.5,pceru=0.5,ss.thr=c(0.6,0.65),size=0.632,
-,steps=200,pointwise=F,nbiclust=1,savepath=TRUE)
+,steps=500,pointwise=F,nbiclust=1,savepath=TRUE)
 )
 #perform s4vd biclustering with fast pointwise stability selection
 system.time(
 ress4vdpw <- s4vd(X,pcerv=0.5,pceru=0.5,ss.thr=c(0.6,0.65),size=0.632,
-,steps=200,pointwise=T,nbiclust=1)
+,steps=500,pointwise=T,nbiclust=1)
 )
 #perform ssvd biclustering
 system.time(

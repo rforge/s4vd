@@ -16,19 +16,11 @@ Number <- 1
 ressim <- BiclustResult(params,RowxNumber,NumberxCol,Number,info)
 
 #perform s4vd biclustering 
-system.time(
-ress4vd <- s4vd(X,pcerv=0.5,pceru=0.5,ss.thr=c(0.6,0.65),size=0.632,
-,steps=500,pointwise=F,nbiclust=1,savepath=TRUE)
-)
+system.time( ress4vd <- biclust(X,method=BCs4vd,pcerv=0.5,pceru=0.5,ss.thr=c(0.6,0.65),steps=500,pointwise=F,nbiclust=1,savepath=TRUE))
 #perform s4vd biclustering with fast pointwise stability selection
-system.time(
-ress4vdpw <- s4vd(X,pcerv=0.5,pceru=0.5,ss.thr=c(0.6,0.65),size=0.632,
-,steps=500,pointwise=T,nbiclust=1)
-)
+system.time( ress4vdpw <- biclust(X,method=BCs4vd,pcerv=0.5,pceru=0.5,ss.thr=c(0.6,0.65),steps=500,pointwise=T,nbiclust=1))
 #perform ssvd biclustering
-system.time(
-resssvd <- biclust(X,BCssvd,K=1)
-)
+system.time(resssvd <- biclust(X,BCssvd,K=1))
 #agreement of the results with the simulated bicluster
 jaccardind(ressim,ress4vd)
 jaccardind(ressim,ress4vdpw)
@@ -43,21 +35,10 @@ stabpath(ress4vdpw,1)
 #parallel coordinates
 parallelCoordinates(X,ress4vd,1,plotBoth=TRUE, compare=TRUE,order = TRUE)
 
-# lung cancer data set (Lee et al. 2010)
-load("lung.RData") 
+#lung cancer data set   Bhattacharjee et al. 2001
 data(lung)
 set.seed(12)
-res1 <- s4vd(lung,pcerv=.5,pceru=0.01,ss.thr=c(0.6,0.65)
-,start.iter=3,size=0.632,cols.nc=T,steps=100,pointwise=T
-,merr=0.0001,iter=100,nbiclust=10,col.overlap=F)
-BCheatmap(lung,res1)
-
-#subset 1000 genes showing the highest variability
-vars <- apply(lung,1,var)
-p <- 1000
-ord <- order(vars,decreasing=TRUE)
-X <- lung[ord[1:p],]
 res2 <- s4vd(lung,pcerv=.5,pceru=0.01,ss.thr=c(0.6,0.65)
 ,start.iter=3,size=0.632,cols.nc=T,steps=100,pointwise=T
 ,merr=0.0001,iter=100,nbiclust=10,col.overlap=F)
-BCheatmap(X,res2)
+BCheatmap(lung,res2)

@@ -24,7 +24,7 @@
 #Note that pointwise needs to be TRUE to save the path. For extreme high dimensional data sets (e.g. the lung cancer example) the resulting
 #biclust object may exceed the available memory.
 
-
+require(biclust)
 
 s4vd <- function(
 		X,
@@ -750,6 +750,26 @@ thresh <- function(z,delta,  type=1, a=3.7){
     return(sign(z)*(abs(z)>=delta)*(abs(z)-delta)*(abs(z)<=2*delta)+
 	((a-1)*z-sign(z)*a*delta)/(a-2)*(2*delta<abs(z))*(abs(z)<=a*delta)+z*(abs(z)>a*delta))
   }
+}
+
+#s4 classes
+setClass('BCs4vd',
+		contains = 'BiclustMethod',
+		prototype = prototype(
+				biclustFunction = function(X,...){s4vd(X,...)}))
+
+BCs4vd <- function() {
+	return(new('BCs4vd'))
+}
+
+
+setClass('BCssvd',
+		contains = 'BiclustMethod',
+		prototype = prototype(
+				biclustFunction = function(X,...){ssvdBC(X,...)}))
+
+BCssvd <- function() {
+	return(new('BCssvd'))
 }
 
 

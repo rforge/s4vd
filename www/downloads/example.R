@@ -6,6 +6,7 @@ v <- c(10,-10,8,-8,5,-5,rep(3,5),rep(-3,5),rep(0,34))
 u <- u/sqrt(sum(u^2)) 
 v <- v/sqrt(sum(v^2))
 d <- 50
+set.seed(1)
 X <- (d*u%*%t(v)) + matrix(rnorm(100*50),100,50)
 params <- info <- list()
 RowxNumber <- matrix(rep(FALSE,100),ncol=1)

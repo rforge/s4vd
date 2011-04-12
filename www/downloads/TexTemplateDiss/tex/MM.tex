@@ -3,6 +3,7 @@ This chapter outlines the development of a new biclustering method that aims to 
 
 \section{The S4VD Algorithm}
 Recently, \citet{Lee2010} proposed a sparse SVD method to find biclusters in high-dimensional gene expression data. Singular vectors of an SVD are interpreted as regression coefficients of a linear regression model. The SSVD algorithm alternately fits penalized regression models to the singular vector pair to obtain a sparse matrix decomposition. The sparseness of the resulting singular vectors depends on the choice of the penalization parameter. In this thesis, we propose to choose the penalization parameters by stability selection \cite{Meinshausen2010}. Stability selection is a subsampling procedure that can be applied to penalized regression models to select stable variables. In addition, stability selection offers the possibility to control type-one error rates \cite{Dudoit2003}, e.g. the per-family error rate (PFER) or the per-comparison wise error rate (PCER). 
+%So far, the S4VD method is the first biclustering approach that takes the cluster stability regarding perturbations of the data into account.
 %Applying the new combined algorithm, the sparse SVD algorithm with nested stability selection (S4VD), to a lung cancer gene expression data set reveals biclusters that represent lung cancer subtypes characterized by relevant sets of coregulated genes. In a simulation study we compare the S4VD with the SSVD algorithm as well as the improved Plaid Model \cite{Turner2005} and the ISA \cite{Bergmann2003}.
 
 \subsection{SVD and Biclustering}
@@ -10,10 +11,12 @@ Let $\mathbf{X}=(x_{ij}) \in \mathbb{R}^{p \times n}$  be the gene expression ma
 \begin{equation}
  \mathbf{X} \approx \mathbf{U}\mathbf{D}\mathbf{V}^{T} = \sum_{k=1}^{r}d_{k}\mathbf{u}_{k}\mathbf{v}_{k}^{T},
 \end{equation}
-where $r$ is the rank of $\mathbf{X}$ and the columns of the matrix $\mathbf{U}=(\mathbf{u}_{1},\cdots,\mathbf{u}_{r})$ are the orthonormal left-singular vectors  and the columns of $\mathbf{V}=(\mathbf{v}_{1},\cdots,\mathbf{v}_{r})$ are the orthonormal right-singular vectors. The elements of the diagonal matrix $\mathbf{D}$ are the corresponding positive singular values $d_{1} \geq d_{2} \geq \cdots d_{r} > 0$. 
-Thus the SVD is the sum of rank one matrices $d_{k}\mathbf{u}_{k}\mathbf{v}_{k}^{T}$, herein after also called SVD-layers.
-According to \citet{Busygin2008} biclustering can be related to the SVD by considering an idealized data matrix.
-This matrix has a block diagonal structure where each block represents a bicluster and the elements outside these blocks are equal to zero:
+where $r$ is the rank of $\mathbf{X}$ and the columns of the matrix $\mathbf{U}=(\mathbf{u}_{1},\cdots,\mathbf{u}_{r})$ are the orthonormal left-singular vectors and the columns of $\mathbf{V}=(\mathbf{v}_{1},\cdots,\mathbf{v}_{r})$ are the orthonormal right-singular vectors. The elements of the diagonal matrix $\mathbf{D}$ are the corresponding positive singular values $d_{1} \geq d_{2} \geq \cdots d_{r} > 0$. 
+Thus the SVD is the sum of rank one matrices $d_{k}\mathbf{u}_{k}\mathbf{v}_{k}^{T}$, herein after also called SVD-layers.\\
+In practical applications the focus often lies on the first SVD-layers that correspond to the largest singular values. The sum of these SVD-layers forms a low rank approximation of $\mathbf{X}$. The remaining SVD-layers that correspond to smaller singular values are usually interpreted as noise. 
+Furthermore, the SVD also finds a wide range of applications in statistics. For instance, in order solve linear least squares problems the SVD can be applied to calculate the pseudoinverse of a matrix. Moreover, the SVD of a mean centered data matrix can be used for principal component analysis (PCA).
+\\
+According to \citet{Busygin2008} biclustering can be related to the SVD by considering an idealized data matrix. This matrix has a block diagonal structure where each block represents a bicluster and the elements outside these blocks are equal to zero:
 \begin{equation}
 \mathbf{X}=
 \begin{pmatrix} 
@@ -23,7 +26,8 @@ This matrix has a block diagonal structure where each block represents a biclust
 0 & 0 & \cdots & \mathbf{X}_{r}
 \end{pmatrix},
 \end{equation}
-where $\mathbf{X}_{k}$, $k=1,\cdots,r$ are submatrices of $\mathbf{X}$. If we decompose $\mathbf{X}$ by the SVD, then each submatrix $\mathbf{X}_{k}$ will be associated with a singular vector pair $(\mathbf{u}_{k},\mathbf{v}_{k})$ such that the non-zero coefficients in $\mathbf{u}_{k}$ represent the rows that belong to $\mathbf{X}_{k}$ and the non-zero coefficients $\mathbf{v}_{k}$ represent the columns that belong to $\mathbf{X}_{k}$. In the presence of noise and if the data matrix has no block diagonal structure, the SVD will still be able to detect the rows and columns of the submatrices as the prominent coefficients in the singular vector pair. These properties make the SVD a practical method for biclustering. 
+where $\mathbf{X}_{k}$, $k=1,\cdots,r$ are submatrices of $\mathbf{X}$. If we decompose $\mathbf{X}$ by the SVD, then each submatrix $\mathbf{X}_{k}$ will be associated with a singular vector pair $(\mathbf{u}_{k},\mathbf{v}_{k})$ such that the non-zero coefficients in $\mathbf{u}_{k}$ represent the rows that belong to $\mathbf{X}_{k}$ and the non-zero coefficients $\mathbf{v}_{k}$ represent the columns that belong to $\mathbf{X}_{k}$. In the presence of noise and if the data matrix has no block diagonal structure, the SVD will still be able to detect the rows and columns of the submatrices as the prominent coefficients in the singular vector pair. These properties make the SVD a practical method for biclustering. Furthermore, most existing biclustering algorithms use the SVD directly or have a strong association with it. Among others, these are the Plaid Model \cite{Lazzeroni2000}, the Iterative Signature Algorithm (ISA; Bergmann et al. 2003, Ihmels et al. 2004) or the non-smooth non-negative matrix factorization (nsNMF; Carmona-Saez et al. 2006). \citet{Busygin2008} provide a comprehensive survey about SVD related biclustering methods. Moreover, to keep track of the huge diversity, regarding the mathematical properties of the existing biclustering algorithms, Busygin et al. (2008) suggest to relate new and existing biclustering algorithms to the SVD. 
+    
 
 \subsection{The SSVD Algorithm}
 %A sparse SVD (SSVD) method for biclustering high-dimensional gene expression data has been proposed by \citet{Lee2010}. \\

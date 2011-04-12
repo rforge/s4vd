@@ -10,33 +10,33 @@
 \contentsline {section}{\numberline {2.1}The S4VD Algorithm}{5}
 \contentsline {subsection}{\numberline {2.1.1}SVD and Biclustering}{6}
 \contentsline {subsection}{\numberline {2.1.2}The SSVD Algorithm}{7}
-\contentsline {subsection}{\numberline {2.1.3}Stability Selection}{10}
+\contentsline {subsection}{\numberline {2.1.3}Stability Selection}{11}
 \contentsline {subsection}{\numberline {2.1.4}The SSVD Algorithm with nested Stability Selection}{12}
-\contentsline {subsection}{\numberline {2.1.5}Pointwise error control}{15}
-\contentsline {subsection}{\numberline {2.1.6}The s4vd R-package}{16}
-\contentsline {section}{\numberline {2.2}Simulation Study}{16}
-\contentsline {subsection}{\numberline {2.2.1}Validation indices}{16}
-\contentsline {subsubsection}{\numberline {2.2.1.1}Average relevance and recovery scores}{16}
-\contentsline {subsubsection}{\numberline {2.2.1.2}Average proportions of falsely assigned rows and columns}{17}
-\contentsline {subsection}{\numberline {2.2.2}Selected algorithms}{17}
-\contentsline {subsubsection}{\numberline {2.2.2.1}The Plaid Model}{17}
-\contentsline {subsubsection}{\numberline {2.2.2.2}The Iterative Signature Algorithm (ISA)}{18}
-\contentsline {section}{\numberline {2.3}Evaluation of example data sets}{19}
-\contentsline {subsection}{\numberline {2.3.1}Lung cancer data set}{19}
-\contentsline {subsection}{\numberline {2.3.2}Ependymoma data set}{20}
-\contentsline {subsection}{\numberline {2.3.3}Protein array data set}{20}
-\contentsline {subsection}{\numberline {2.3.4}Gene Set Enrichment Analysis}{20}
-\contentsline {section}{\numberline {2.4}Interactive Graphics}{20}
-\contentsline {subsection}{\numberline {2.4.1}SEURAT}{20}
-\contentsline {chapter}{\numberline {3}Results}{21}
-\contentsline {section}{\numberline {3.1}Simulation study}{21}
-\contentsline {subsection}{\numberline {3.1.1}Scenario 1}{22}
-\contentsline {subsection}{\numberline {3.1.2}Scenario 2}{23}
-\contentsline {section}{\numberline {3.2}Lung cancer data set}{24}
-\contentsline {section}{\numberline {3.3}Ependymoma data set}{25}
-\contentsline {section}{\numberline {3.4}Protein array data set}{25}
-\contentsline {chapter}{\numberline {4}Discussion}{28}
-\contentsline {chapter}{\numberline {5}Summary}{29}
-\contentsline {chapter}{References}{30}
-\contentsline {chapter}{Curriculum Vitae}{34}
-\contentsline {chapter}{Acknowledgement}{35}
+\contentsline {subsection}{\numberline {2.1.5}Pointwise error control}{16}
+\contentsline {subsection}{\numberline {2.1.6}The s4vd R-package}{17}
+\contentsline {section}{\numberline {2.2}Simulation Study}{17}
+\contentsline {subsection}{\numberline {2.2.1}Validation indices}{17}
+\contentsline {subsubsection}{\numberline {2.2.1.1}Average relevance and recovery scores}{17}
+\contentsline {subsubsection}{\numberline {2.2.1.2}Average proportions of falsely assigned rows and columns}{18}
+\contentsline {subsection}{\numberline {2.2.2}Selected algorithms}{18}
+\contentsline {subsubsection}{\numberline {2.2.2.1}The Plaid Model}{18}
+\contentsline {subsubsection}{\numberline {2.2.2.2}The Iterative Signature Algorithm (ISA)}{19}
+\contentsline {section}{\numberline {2.3}Evaluation of example data sets}{20}
+\contentsline {subsection}{\numberline {2.3.1}Lung cancer data set}{20}
+\contentsline {subsection}{\numberline {2.3.2}Ependymoma data set}{21}
+\contentsline {subsection}{\numberline {2.3.3}Protein array data set}{21}
+\contentsline {subsection}{\numberline {2.3.4}Gene Set Enrichment Analysis}{21}
+\contentsline {section}{\numberline {2.4}Interactive Graphics}{21}
+\contentsline {subsection}{\numberline {2.4.1}SEURAT}{21}
+\contentsline {chapter}{\numberline {3}Results}{22}
+\contentsline {section}{\numberline {3.1}Simulation study}{22}
+\contentsline {subsection}{\numberline {3.1.1}Scenario 1}{23}
+\contentsline {subsection}{\numberline {3.1.2}Scenario 2}{24}
+\contentsline {section}{\numberline {3.2}Lung cancer data set}{25}
+\contentsline {section}{\numberline {3.3}Ependymoma data set}{26}
+\contentsline {section}{\numberline {3.4}Protein array data set}{26}
+\contentsline {chapter}{\numberline {4}Discussion}{29}
+\contentsline {chapter}{\numberline {5}Summary}{30}
+\contentsline {chapter}{References}{31}
+\contentsline {chapter}{Curriculum Vitae}{35}
+\contentsline {chapter}{Acknowledgement}{36}

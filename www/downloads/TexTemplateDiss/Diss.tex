@@ -1,0 +1,74 @@
+\documentclass[12pt,a4paper]{scrreprt}
+\usepackage{paperstyle}
+\pagestyle{plain}
+\usepackage{namedScHumEngl}% um nach Schum in Englisch zu zitieren
+
+
+%***************
+\begin{document}
+\include{tex/Titelseite}
+\onehalfspacing
+\include{tex/Seite2}
+%\include{tex/Widmung}
+\setlength{\oddsidemargin}{0.5cm}
+\pagenumbering{roman}\setcounter{page}{1}
+\setcounter{page}{1}
+\setcounter{tocdepth}{2}
+\tableofcontents
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
+\listoffigures 
+\addcontentsline{toc}{chapter}{List of Figures}
+\singlespacing
+\input{tex/Abkuerzungen}
+\newpage
+
+
+% Seitenlayout fuer die Arbeit definieren
+\onehalfspacing
+\pagestyle{Diss}
+\renewcommand{\chaptermark}[1]{\markboth{\thechapter.\ #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection.\ #1}}
+\pagenumbering{arabic}\setcounter{page}{1}
+
+% Einleitung
+\include{tex/Einleitung}
+
+% Material und Methods
+\include{tex/Fragestellung}
+% Material und Methods
+\include{tex/MM}
+% Results 
+\include{tex/results}
+% Discussion
+\include{tex/Diskussion}
+% Zusammenfassung
+\include{tex/Zusammenfassung}
+
+% Results 
+
+% Discussion
+
+% References
+\clearpage
+\thispagestyle{plain}
+\addcontentsline{toc}{chapter}{References}
+\markboth{Reference}{Reference}
+\bibliography{diss}
+\bibliographystyle{ScHumEngl}
+
+\include{tex/Eigenbib}
+
+% Appendix
+\pagestyle{Diss2}
+\renewcommand{\chaptermark}[1]{\markboth{Appendix \thechapter.\ #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection.\ #1}}
+\begin{appendix}
+
+\end{appendix}
+
+% Additional Things 
+\include{tex/Lebenslauf}
+\include{tex/Danksagung}
+\end{document}
+

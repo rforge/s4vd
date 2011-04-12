@@ -1,0 +1,316 @@
+\chapter{Material and Methods}
+This chapter outlines the development of a new biclustering method that aims to identify biclusters in high-dimensional microarray data taking the stability of the  clustering result into account. The chapter is organized in four parts. In the first part, the sparse singular value decomposition (SSVD) proposed by \citet{Lee2010} and the stability selection by \citet{Meinshausen2010} is described. Then, the new developed biclustering method, the S4VD algorithm, which is a combination of these two approaches is introduced. Furthermore, the R-package \textit{s4vd} which provides the S4VD algorithm and additional visualization functions is presented. In the second part, the design of the simulation study that compares the S4VD algorithm with other biclustering methods is illustrated. In this context, validation indices for the evaluation of the simulation results are described. In order to demonstrate the practical application of the S4VD algorithm, the third part delineates the evaluation of three microarray data sets. In the final part, the interactive visualization software SEURAT \cite{Gribov2010} is presented. SEURAT is an open source software tool which provides interactive visualization capability for the integrated analysis of high-dimensional microarray data together with associated clinical and genomical data. Besides other clustering algorithms SEURAT offers several biclustering methods including the S4VD algorithm.
+
+\section{The S4VD Algorithm}
+Recently, \citet{Lee2010} proposed a sparse SVD method to find biclusters in high-dimensional gene expression data. Singular vectors of an SVD are interpreted as regression coefficients of a linear regression model. The SSVD algorithm alternately fits penalized regression models to the singular vector pair to obtain a sparse matrix decomposition. The sparseness of the resulting singular vectors depends on the choice of the penalization parameter. In this thesis, we propose to choose the penalization parameters by stability selection \cite{Meinshausen2010}. Stability selection is a subsampling procedure that can be applied to penalized regression models to select stable variables. In addition, stability selection offers the possibility to control type-one error rates \cite{Dudoit2003}, e.g. the per-family error rate (PFER) or the per-comparison wise error rate (PCER). 
+%Applying the new combined algorithm, the sparse SVD algorithm with nested stability selection (S4VD), to a lung cancer gene expression data set reveals biclusters that represent lung cancer subtypes characterized by relevant sets of coregulated genes. In a simulation study we compare the S4VD with the SSVD algorithm as well as the improved Plaid Model \cite{Turner2005} and the ISA \cite{Bergmann2003}.
+
+\subsection{SVD and Biclustering}
+Let $\mathbf{X}=(x_{ij}) \in \mathbb{R}^{p \times n}$  be the gene expression matrix with indices $i=1,\cdots,p$ and $j=1,\cdots,n$. The number of genes $p$ is usually by multiple greater than the number of samples $n$. The SVD of $\mathbf{X}$ can be written as:
+\begin{equation}
+ \mathbf{X} \approx \mathbf{U}\mathbf{D}\mathbf{V}^{T} = \sum_{k=1}^{r}d_{k}\mathbf{u}_{k}\mathbf{v}_{k}^{T},
+\end{equation}
+where $r$ is the rank of $\mathbf{X}$ and the columns of the matrix $\mathbf{U}=(\mathbf{u}_{1},\cdots,\mathbf{u}_{r})$ are the orthonormal left-singular vectors  and the columns of $\mathbf{V}=(\mathbf{v}_{1},\cdots,\mathbf{v}_{r})$ are the orthonormal right-singular vectors. The elements of the diagonal matrix $\mathbf{D}$ are the corresponding positive singular values $d_{1} \geq d_{2} \geq \cdots d_{r} > 0$. 
+Thus the SVD is the sum of rank one matrices $d_{k}\mathbf{u}_{k}\mathbf{v}_{k}^{T}$, herein after also called SVD-layers.
+According to \citet{Busygin2008} biclustering can be related to the SVD by considering an idealized data matrix.
+This matrix has a block diagonal structure where each block represents a bicluster and the elements outside these blocks are equal to zero:
+\begin{equation}
+\mathbf{X}=
+\begin{pmatrix} 
+\mathbf{X}_{1} & 0 & \cdots & 0\\
+0 & \mathbf{X}_{2} & 0 & \cdots \\
+\vdots  & \vdots  & \ddots  & 0 \\
+0 & 0 & \cdots & \mathbf{X}_{r}
+\end{pmatrix},
+\end{equation}
+where $\mathbf{X}_{k}$, $k=1,\cdots,r$ are submatrices of $\mathbf{X}$. If we decompose $\mathbf{X}$ by the SVD, then each submatrix $\mathbf{X}_{k}$ will be associated with a singular vector pair $(\mathbf{u}_{k},\mathbf{v}_{k})$ such that the non-zero coefficients in $\mathbf{u}_{k}$ represent the rows that belong to $\mathbf{X}_{k}$ and the non-zero coefficients $\mathbf{v}_{k}$ represent the columns that belong to $\mathbf{X}_{k}$. In the presence of noise and if the data matrix has no block diagonal structure, the SVD will still be able to detect the rows and columns of the submatrices as the prominent coefficients in the singular vector pair. These properties make the SVD a practical method for biclustering. 
+
+\subsection{The SSVD Algorithm}
+%A sparse SVD (SSVD) method for biclustering high-dimensional gene expression data has been proposed by \citet{Lee2010}. \\
+In the following the SSVD method proposed by \cite{Lee2010} is described. The idea is to interpret the singular vectors of a regular SVD as regression coefficients of a linear regression and use sparsity-inducing penalties to obtain sparse singular vector pairs. According to \citet{Eckart1936} the first SVD-layer gives us the best rank-one approximation of $\mathbf{X}$ with respect to the squared Frobenius norm, i.e. 
+\begin{equation}
+ (d_{1},\mathbf{u}_{1},\mathbf{v}_{1})=\text{arg} \mathop{\mbox{min}}_{d,\mathbf{u},\mathbf{v}} \left\Vert \mathbf{X} - d\mathbf{u}\mathbf{v}^{T} \right\Vert_{F}^{2},
+\label{eq:3}
+\end{equation}
+where $\left\Vert \cdot \right\Vert_{F}^{2}$ indicates the squared Frobenius norm, which is the sum of squared elements of the matrix.
+\citet{Lee2010} showed how this rank-one approximation can be related to linear regression. Suppose $\mathbf{u}_1$ is fixed, then the minimization of (\ref{eq:3}) with respect to $(d_{1},\mathbf{v}_{1})$ is equivalent to a minimization with respect to  $\mathbf{\tilde{v}}_{1}=(d_{1}\mathbf{v}_{1})$.
+Accordingly, the loss function can be written as minimization of the squared $\textit{l}^{2}$-norm:
+\begin{equation}\left\Vert \mathbf{X} - \mathbf{u}_{1}\mathbf{\tilde{v}}_{1}^{T}\right\Vert_{F}^{2}=
+\left\Vert \mathbf{y}-(I_{n}\otimes\mathbf{u}_{1})\mathbf{\tilde{v}}_{1}\right\Vert,
+\label{eq:4}
+\end{equation}
+where $\mathbf{y}=(\mathbf{x}_{1}^{T},\cdots,\mathbf{x}_{n}^{T})^T \in \mathbb{R}^{pn}$ with $\mathbf{x}_{j}$ being the $j$th column of $\mathbf{X}$. Then the minimization of (\ref{eq:4}) can be interpreted as least squares problem with $\mathbf{y}$ as the response vector, $I_{n}\otimes\mathbf{u}_{1}$ as the design matrix and the $\mathbf{\tilde{v}}_{1}$ as vector of regression coefficients. The least squares estimator of $\mathbf{\tilde{v}}_{1}$ is: 
+\begin{equation}
+\begin{split}
+\mathbf{\hat{\tilde{v}}}_{1}=
+\left\{(I_{n}\otimes\mathbf{u}_{1})^T(I_{n}\otimes\mathbf{u}_{1})\right\}^{-1}(I_{n}\otimes\mathbf{u}_{1})^T\mathbf{y}=\\
+(\mathbf{u}_{1}^{T}\mathbf{x}_{1},\cdots,\mathbf{u}_{1}^{T}\mathbf{x}_{n})^{T}=\mathbf{X}^{T}\mathbf{u_{1}}.
+\end{split}
+\end{equation}
+In the same way we can derive the least squares estimator for the product of the first left singular vector multiplied with the first singular value $\mathbf{\tilde{u}}_{1}$. So without loss of generality with $\mathbf{v}_1$ fixed the minimization of (\ref{eq:3}) with respect to $\mathbf{\tilde{u}}_{1}=(d_{1}\mathbf{u}_{1})$ is given by the minimization of:
+\begin{equation}
+\left\Vert \mathbf{X} - \mathbf{\tilde{u}}_{1}\mathbf{v}_{1}^{T}\right\Vert_{F}^{2}=
+\left\Vert \mathbf{z}-(I_{n}\otimes\mathbf{v}_{1})\mathbf{\tilde{u}}_{1}\right\Vert,
+\label{eq:6}
+\end{equation}
+where $\mathbf{z}=(\mathbf{x}_{1},\cdots,\mathbf{x}_{p})^{T} \in \mathbb{R}^{pn}$ with $\mathbf{x}_{i}^{T}$ being the $i$th row of $\mathbf{X}$. Here $\mathbf{z}$ is the response vector and $(I_{n}\otimes\mathbf{v}_{1})$ is the design matrix.\\
+Finally, the least squares estimator of $\mathbf{\tilde{u}}_{1}$ is given by:
+\begin{equation}
+\begin{split}
+\mathbf{\hat{\tilde{u}}}_{1}=
+\left\{(I_{n}\otimes\mathbf{v}_{1})^T(I_{n}\otimes\mathbf{v}_{1})\right\}^{-1}(I_{n}\otimes\mathbf{v}_{1})^T\mathbf{z}=\\
+(\mathbf{x}_{1}^{T}\mathbf{v}_{1},\cdots,\mathbf{x}_{p}^{T}\mathbf{v}_{1})=\mathbf{X}\mathbf{v_{1}}.
+\end{split}
+\end{equation}
+In order to obtain sparse singular vector pairs, Lee et al. (2010) suggest to find the first SVD-layer that minimizes the Frobenius norm subject to sparsity-inducing penalty terms $P_{1}(d_{1}\mathbf{u}_{1})$ and $P_{2}(d_{1}\mathbf{v}_{1})$:
+\begin{equation} \left\Vert \mathbf{X} - d_{1}\mathbf{u}_{1}\mathbf{v}_{1}^{T}\right\Vert_{F}^{2} + \lambda_{\mathbf{u}_{1}}P_{1}(d_{1} \mathbf{u}_{1}) + \lambda_{\mathbf{v}_{1}}P_{2}(d_{1} \mathbf{v}_{1}),
+\label{eq:8}
+\end{equation}
+where $\lambda_{\mathbf{u}_{1}}$ and $\lambda_{\mathbf{v}_{1}}$ are tuning parameters. Possible penalty functions are the adaptive lasso penalties \cite{Zou2006}. The corresponding penalized function is given by:
+\begin{equation}
+P_{1}(d_{1}\mathbf{u_{1}})=d_{1}\sum_{i=1}^{p}w_{1,i}|u_{i}|,\quad P_{2}(d_{1} \mathbf{v_{1}})=d_{1}\sum_{j=1}^{n}w_{2,j}|v_{j}|,
+\end{equation}
+where $w_{1,i}$ and $w_{2,j}$ are weights that can be chosen according to \citet{Zou2006}, e.g. for $w_{1,i}=w_{2,j}=1$ we obtain the lasso penalty.
+Thus the penalty functions are weighted sums of the absolute values of the elements of the first singular vector pair. 
+\nocite{Tib1996}
+Fixing $\mathbf{u}_{1}$ and using the adaptive lasso penalty the minimization of (\ref{eq:8}) becomes:
+\begin{equation}
+\begin{split}
+\left\Vert \mathbf{X} - d_{1}\mathbf{u}_{1}\mathbf{v}_{1}^{T}\right\Vert_{F}^{2} + \lambda_{\mathbf{v}}\sum_{j=1}^{n}w_{2,j}|v_{j}|= \\
+\left\Vert \mathbf{X} \right\Vert_{F}^{2} + \sum_{j=1}^{n} \left\{ \tilde{v}_{j}^2 - 2\tilde{v}_{j}(\mathbf{X}^{T}\mathbf{u}_{1})_{j} + \lambda_{\mathbf{v}} w_{2,j}|\tilde{v}_{j}|\right\}.
+\end{split}   
+\label{eq:10}      
+\end{equation} 
+To solve this penalized regression and estimate the sparse right singular vector, \citet{Lee2010} proposed an algorithm that incorporates a simple component-wise thresholding rule. The component-wise minimizer of (\ref{eq:10}) is:
+\begin{equation}
+\hat{\tilde{v}}_{1,j}=\textit{sign}\left\{(\mathbf{X}^{T}\mathbf{u}_{1})_{j}\right\}(|(\mathbf{X}^{T}\mathbf{u}_{1})_{j}|-\lambda_{\mathbf{v}}w_{2,j}/2)_{+}.
+\end{equation}
+This is the well known soft threshold estimator proposed by \citet{Tibshirani1996}. Then $\mathbf{\hat{\tilde{v}}_{1}}=(\hat{\tilde{v}}_{1,1},\cdots,\hat{\tilde{v}}_{1,n})^{T}$, is an estimate for the product of the first right singular vector multiplied with the first singular vector. In order to get an estimate for the first sparse right singular vector we have to update the first singular value. The first update of $d_{1}$ is $d_{1,\mathbf{v}_{1}}=\left\Vert\mathbf{\hat{\tilde{v}}_{1}}\right\Vert$ and accordingly the estimated sparse singular vector becomes $\mathbf{\hat{v}}_{1}=\mathbf{\hat{\tilde{v}}_{1}}/d_{1,\mathbf{v}_{1}}$.
+The penalized regression for the left singular vector can be solved in the same way. For fixed $\mathbf{v}_{1}$ and with the adaptive lasso penalty the loss function of (\ref{eq:8}) becomes:
+\begin{equation}
+\begin{split}
+\left\Vert \mathbf{X} - d_{1}\mathbf{u}_{1}\mathbf{v}_{1}^{T}\right\Vert_{F}^{2} + \lambda_{\mathbf{u}}\sum_{i=1}^{p}w_{1,i}|u_{i}|= \\
+\left\Vert \mathbf{X} \right\Vert_{F}^{2} + \sum_{i=1}^{p} \left\{ \tilde{u}_{i}^2 - 2\tilde{u}_{i}(\mathbf{X}\mathbf{v}_{1})_{i} + \lambda_{\mathbf{u}} w_{1,i}|\tilde{u}_{i}|\right\}.
+\end{split}  
+\label{eq:12}    
+\end{equation} 
+The component-wise minimizer of (\ref{eq:12}) is:
+\begin{equation}
+\hat{\tilde{u}}_{1,i}=\textit{sign}\left\{(\mathbf{X}\mathbf{v}_{1})_{i}\right\}(|(\mathbf{X}\mathbf{v}_{1})_{i}|-\lambda_{\mathbf{u}}w_{1,i}/2)_{+}.
+\end{equation}
+The updated singular value is $d_{1,\mathbf{u}_{1}}=\left\Vert\mathbf{\tilde{u}_{1}}\right\Vert$, with $\mathbf{\hat{\tilde{u}}_{1}}=(\hat{\tilde{u}}_{1,1},\cdots,\hat{\tilde{u}}_{1,p})^{T}$. Finally, the estimated sparse left singular vector is $\mathbf{\hat{u}}_{1}=\mathbf{\hat{\tilde{u}}_{1}}/d_{1,\mathbf{u}_{1}}$.\\
+
+The \textit{degree of sparsity}, which is defined as the number of non-zero coefficients in the singular vector pair, depends on the choice of the penalty parameters.
+\citet{Lee2010} proposed to choose the optimal \textit{degree of sparsity} by computing the complete penalization path and apply the penalty parameter that minimizes the Bayesian information criterion (BIC) \cite{Schwarz1978}. In case of the penalized regression model estimating the right singular vector (\ref{eq:10}) the BIC is:
+\begin{equation}
+\text{BIC}(\lambda_{\mathbf{v}_{1}})=\frac{\left\Vert \mathbf{z}- \hat{\mathbf{z}} \right\Vert^{2}}{np\hat{\sigma}^{2}} + \frac{log(np)}{np} \hat{df}(\lambda_{\mathbf{v}_{1}}), 
+\end{equation}
+where $\hat{df}(\lambda_{\mathbf{v}_{1}})$ is the \textit{degree of sparsity} and $\hat{\sigma}$ is the least squares estimate of the error variance of the regression model. For the penalized regression model estimating the left singular vector (\ref{eq:12}) the BIC is:
+\begin{equation}
+\text{BIC}(\lambda_{\mathbf{u}_{1}})=\frac{\left\Vert \mathbf{y}- \hat{\mathbf{y}} \right\Vert^{2}}{np\hat{\sigma}^{2}} + \frac{log(np)}{np} \hat{df}(\lambda_{\mathbf{u}_{1}}).
+\end{equation}
+In the SSVD algorithm the two regressions with the corresponding parameter tuning are alternated until convergence is reached, which is if either $\left\Vert \mathbf{v}_{1} - \mathbf{\hat{v}}_{1}\right\Vert < \epsilon$ or $\left\Vert \mathbf{u}_{1} - \mathbf{\hat{u}}_{1} \right\Vert < \epsilon$, where $\epsilon > 0$ is an arbitrary convergence threshold. After convergence the final estimate of the first singular value of the sparse SVD-layer is $\hat{d}_{1}=\mathbf{\hat{u}}_{1}^{T}\mathbf{X}\mathbf{\hat{v}}_{1}$. The next sparse rank-one approximation can be obtained by subtracting the sparse SVD-layer and applying the SSVD method to the residual matrix $\mathbf{X}-\hat{d}_{1}\mathbf{\hat{u}}_{1}\mathbf{\hat{v}}_{1}^{T}$. \\
+\\
+\\
+%\newpage
+\hspace{-0.1cm} 
+\rule{14.75 cm}{1pt}
+
+\begin{bf}The SSVD Algorithm\end{bf}\\
+\hspace{-0.1cm} 
+\rule{14.75 cm}{1pt}
+\begin{enumerate}
+ \item Apply the standard SVD to $\mathbf{X}$. Let $\left\{ d_{1}, \mathbf{u}_{1}, \mathbf{v}_{1} \right\}$ denote the first SVD triplet.
+ \item Update:
+  \begin{enumerate}
+   \item Set $\hat{\tilde{u}}_{1,i}=\textit{sign}\left\{(\mathbf{X}\mathbf{v_{1}})_{i}\right\}(|(\mathbf{X}\mathbf{v_{1}})_{i}|-\lambda_{\mathbf{u}}w_{1,i}/2)_{+}$, 		      where $\lambda_{u}$ minimizes the $\textit{BIC}$. 
+         Let $\mathbf{\hat{\tilde{u}}_{1}}=(\hat{\tilde{u}}_{1,1},\cdots,\hat{\tilde{u}}_{1,p})^{T}$,
+	 $d_{1,\mathbf{u}_{1}}=\left\Vert \mathbf{\hat{\tilde{u}}_{1}} \right\Vert$, 
+	 and $\mathbf{\hat{u}_{1}} = \mathbf{\hat{\tilde{u}}_{1}}/d_{1,\mathbf{u}_{1}}$.
+   \item Set $\hat{\tilde{v}}_{1,j}=\textit{sign}\left\{(\mathbf{X}^{T}\mathbf{\hat{u}}_{1})_{j}\right\}(|(\mathbf{X}^{T}\mathbf{\hat{u}}_{1})_{j}|-\lambda_{\mathbf{v}_{1}}w_{2,j}/2)_{+}$, where
+	 $\lambda_{v}$ minimizes the $\textit{BIC}$. 
+         Let $\mathbf{\hat{\tilde{v}}_{1}}=(\hat{\tilde{v}}_{1,1},\cdots,\hat{\tilde{v}}_{1,n})^{T}$,
+	 $d_{1,\mathbf{v}_{1}}=\left\Vert \mathbf{\hat{\tilde{v}}_{1}} \right\Vert$, 
+	 and $\mathbf{\hat{v}_{1}} =\mathbf{\hat{\tilde{v}}}/d_{1,\mathbf{v}_{1}}$.
+   \item Set $\mathbf{v}_{1}=\mathbf{\hat{v}}_{1}$, $\mathbf{u}_{1}=\mathbf{\hat{u}}_{1}$ and repeat 2(a) and 2(b) until convergence.
+  \end{enumerate} 
+ \item Set $\hat{d}_{1}=\mathbf{\hat{u}}_{1}^{T}\mathbf{X}\mathbf{\hat{v}}_{1}$.
+ \item To obtain the next layer apply steps 1 to 3 to the residual matrix $\mathbf{X}-\hat{d}_{1}\mathbf{\hat{u}}_{1}\mathbf{\hat{v}}_{1}^{T}$.
+\end{enumerate}
+\hspace{-0.1cm} 
+\rule{14.75 cm}{1pt}\\
+In practice we observed that choosing the regularization parameters according to the BIC results in singular vector pairs with a relative low \textit{degree of sparsity}. In addition, the SSVD algorithm does not offer a stopping criterion and so the choice of the number of SVD-layers is arbitrary.
+
+\subsection{Stability Selection}
+In this thesis, we propose to choose the penalization parameters and to control the \textit{degree of sparsity} of the resulting SVD-layers using stability selection \cite{Meinshausen2010}. The idea of stability selection is to combine resampling with variable selection methods, e.g. penalized regression models. For each variable its probability of being selected is estimated by resampling the data and calculating relative frequencies of being selected. \citet{Meinshausen2010} provide a theoretical framework for controlling type-one error rates of falsely selecting variables based on the maximum of these selection probabilities over the range of regularization parameters. \\
+Supposing interest lies in the inference of the true set of non-zero coefficients in the left singular vector $S_{\mathbf{u}_{1}}=\left\{i:u_{i} \neq 0 \right\}$. The set of possible penalization parameters that can be applied within the adaptive lasso regression is $\Lambda_{\mathbf{u}_{1}}$. Each $\lambda_{\mathbf{u}_{1}} \in \Lambda_{\mathbf{u}_{1}}$ leads to a different estimated subset of indices of non-zero coefficients $\hat{S}^{\lambda_{\mathbf{u}_{1}}}_{\mathbf{u}_{1}}\subseteq\left\{1,\cdots,p\right\}$. 
+\citet{Meinshausen2010} illustrate the stability selection with the so-called stability paths that show the 
+selection probabilities of each coefficient along the range of penalization parameters. Given any $\lambda_{\mathbf{u}_{1}}$ the estimated set $\hat{S}^{\lambda_{\mathbf{u}_{1}}}_{\mathbf{u}_{1}}$ can be written as a function of the samples $J=\left\{1,\cdots,n \right\} $, e.g. $\hat{S}^{\lambda_{\mathbf{u}_{1}}}_{\mathbf{u}_{1}}=\hat{S}^{\lambda_{\mathbf{u}_{1}}}_{\mathbf{u}_{1}}(J)$. If $J^{*} \subset J$ is a subsample drawn without replacement, then the estimated selection probability is:
+\begin{equation}
+ \hat{\Pi}_{i}^{\lambda_{\mathbf{u}_{1}}}=P(i \in \hat{S}^{\lambda_{\mathbf{u}_{1}}}_{\mathbf{u}_{1}}(J^{*})).
+\end{equation}
+The selection probability can be estimated by calculating the relative selection frequencies of $i$ with regard to all subsamples.
+Given an arbitrary threshold $\pi_{thr} \in (0.5,1)$ and the set of penalization parameters $\Lambda_{\mathbf{u}_{1}}$, the set of non-zero coefficients estimated with the stability selection is:
+\begin{equation} 
+ \hat{S}_{\mathbf{u}_{1}}^{stable}=\left\{i: \max_{\lambda_{\mathbf{u}_{1}} \in \Lambda_{\mathbf{u}_{1}}}\hat{\Pi}_{i}^{\lambda_{\mathbf{u}_{1}}} \geq \pi_{thr} \right\}.
+\end{equation}
+According to \citet{Meinshausen2010} the value of $\pi_{thr}$ has a neglectible influence and they recommend to choose values in the range of $[0.6,0.9]$. Let $\hat{S}^{\Lambda_{\mathbf{u}_{1}}}= \cup_{\lambda_{\mathbf{u}_{1}} \in \Lambda_{\mathbf{u}_{1}}} \hat{S}^{\lambda_{\mathbf{u}_{1}}}$ be
+the union of the estimated sets of selected coefficients with regard to all $\lambda_{\mathbf{u}_{1}} \in \Lambda_{\mathbf{u}_{1}}$.
+Then the average number of selected coefficients is $q_{\Lambda_{\mathbf{u}_{1}}}=E(|\hat{S}^{\Lambda_{\mathbf{u}_{1}}}(J^{*})|)$. 
+Let $N_{\mathbf{u}_{1}}$ denote the set of zero coefficients, then the number of falsely selected coefficients with stability selection is given by $V_{\mathbf{u}_{1}}=|N_{\mathbf{u}_{1}}\cap\hat{S}_{\mathbf{u}_{1}}^{stable}|$. 
+Following Theorem 1 in \citet{Meinshausen2010} the expected number of falsely selected coefficients is bounded by:
+\begin{equation}
+E(V_{\mathbf{u}_{1}}) \leq \frac{1}{(2\pi_{thr}-1)} \frac{q^{2}_{\Lambda_{\mathbf{u}_{1}}}}{p}.
+\label{eq:15}
+\end{equation}
+Interpreting equation (\ref{eq:15}) the expected number of falsely selected coefficients decreases by either reducing the average number of selected coefficients $q_{\Lambda_{\mathbf{u}_{1}}}$ or by increasing the threshold $\pi_{thr}$. Supposing that $\pi_{thr}$ is fixed the stability selection controls the desired error level of $E(V_{\mathbf{u}_{1}})$ as long as the average number of selected coefficients is less then $e_{\Lambda_{\mathbf{u}_{1}}}$, where $e_{\Lambda_{\mathbf{u}_{1}}} = \sqrt{E(V_{\mathbf{u}_{1}})p(2\pi_{thr}-1)}$ is an upper bound for the average number of selected coefficients that can be controlled by reducing the length of the regularization path $\Lambda_{\mathbf{u}_{1}}$. In multiple testing the expected number of falsely selected variables is also known as the per-family error rate (PFER) and if divided by the total number of the variables it will become the per-comparison error rate (PCER) \cite{Dudoit2003}. The stability selection allows to control these type-one error rates. 
+
+\subsection{The SSVD Algorithm with nested Stability Selection}
+Here we propose to replace the BIC based penalty parameter selection of the SSVD algorithm by the stability selection. 
+This combined approach allows to control the expected number of falsely selected non-zero coefficients in the singular vector pair and therefore the \textit{degree of sparsity} of the resulting SVD-layers. Furthermore, the error control also serves as stopping criterion for the improved SSVD algorithm and determines the number of reasonable layers. \\
+We aim to estimate the left singular vector $\mathbf{\hat{u}}_{1}$ and at the same time infer the true set of non-zero coefficients $S_{\mathbf{u}_{1}}$.
+For each possible $\lambda_{\mathbf{u}_{1}}$ we draw subsamples and estimate the selection probabilities $\hat{\Pi}_{i}^{\lambda_{\mathbf{u}_{1}}}$.
+Given a threshold $\pi_{thr}$ and the desired type-one error $E(V_{\mathbf{u}_{1}})$, the regularization region $\Lambda_{\mathbf{u}_{1}}$ is defined so that $q_{\Lambda_{\mathbf{u}_{1}}} \leq e_{\Lambda_{\mathbf{u}_{1}}}$.
+Then the estimated set of non-zero coefficients is:\\
+\begin{equation}
+\hat{S}_{\mathbf{u}_{1}}^{stable}=\left\{i: \max_{\lambda_{\mathbf{u}_{1}} \in \Lambda_{\mathbf{u}_{1}}} \hat{\Pi}_{i}^{\lambda_{\mathbf{u}_{1}}} \geq \pi_{thr} \right\}
+\end{equation}
+To estimate $\mathbf{\hat{\tilde{u}}_{1}}$ we apply the component-wise minimizer of Lee et al. (2010) with the smallest penalization value of the regularization path $\lambda_{\mathbf{u}_{1}}^{min}$.
+\begin{equation}
+\hat{\tilde{u}}_{1,i}=\textit{sign} \left\{(\mathbf{X}\mathbf{v}_{1})_{i} \right\} (|(\mathbf{X}\mathbf{v}_{1})_{i}|- \lambda^{min}_{\mathbf{u}_{1}}w_{1,i}/2)_{+} 
+\end{equation}
+Like in the original SSVD approach, the first update of the singular value is $d_{1,\mathbf{u}_{1}}=\left\Vert\mathbf{\hat{\tilde{u}}_{1}}\right\Vert$, with 
+$\mathbf{\hat{\tilde{u}}_{1}}=(\hat{\tilde{u}}_{1,1},\cdots,\hat{\tilde{u}}_{1,n})^{T}$. The estimated sparse singular vector is  $\mathbf{\hat{u}_{1}}=\mathbf{\hat{\tilde{u}}_{1}}/d_{1,\mathbf{u}_{1}}$.
+Without loss of generality we estimate the sparse right singular vector $\mathbf{\hat{v}}_{1}$ and infer the respective set of non-zero coefficients $S_{\mathbf{v}_{1}}$. The selection probabilities $\hat{\Pi}_{j}^{\lambda_{\mathbf{v}_{1}}}$ for each $\lambda_{\mathbf{v}_{1}}$ are estimated by drawing subsets of the genes $I^{*} \subset I$, where $I=\left\{1,\cdots,p \right\}$. Again, given the desired type-one error $E(V_{\mathbf{v}_{1}})$ and the threshold $\pi_{thr}$ the regularization region is delimited such that $q_{\Lambda_{\mathbf{v}_{1}}} \leq e_{\Lambda_{\mathbf{v}_{1}}}$, where $e_{\Lambda_{\mathbf{v}_{1}}}= \sqrt{E(V_{\mathbf{v}_{1}})n(2\pi_{thr}-1)}$. 
+Consequently, the estimated set of non-zero coefficients in the right singular vector is:
+\begin{equation}
+\hat{S}_{\mathbf{v}_{1}}^{stable}=\left\{j: \max_{\lambda_{\mathbf{v}_{1}} \in \Lambda_{\mathbf{v}_{1}}}\hat{\Pi}_{j}^{\lambda_{\mathbf{v}_{1}}} \geq \pi_{thr} \right\}
+\end{equation}
+Given the smallest parameter of the penalization path $\lambda^{min}_{\mathbf{v}_{1}}$ the components of $\mathbf{\tilde{v}_{1}}$ are:
+\begin{equation}
+     \hat{\tilde{v}}_{1,j}= \textit{sign}\left\{(\mathbf{X}^{T}\mathbf{u}_{1})_{j}\right\}(|(\mathbf{X}^{T}\mathbf{u}_{1})_{j}|-\lambda^{min}_{\mathbf{v}_{1}}w_{2,j}/2)_{+}
+\end{equation}
+Finally let $\mathbf{\hat{\tilde{v}}_{1}}=(\hat{\tilde{v}}_{1,1},\cdots,\hat{\tilde{v}}_{1,n})^{T}$, the updated first singular value is $d_{1,\mathbf{v}_{1}}=\left\Vert\mathbf{\tilde{v}_{1}}\right\Vert$ and estimated sparse singular vector is $\mathbf{\hat{v}}=\mathbf{\hat{\tilde{v}}_{1}}/d_{1,\mathbf{v}_{1}}$. \\
+These two penalized regression models with the nested stability selection are alternated until convergence, e.g. that is if either $\left\Vert \mathbf{v}_{1} - \mathbf{\hat{v}}_{1}\right\Vert < \epsilon$ or $\left\Vert \mathbf{u}_{1} - \mathbf{\hat{u}}_{1} \right\Vert < \epsilon$, where $\epsilon > 0$.
+After convergence the estimated singular value is $\hat{d}_{1}=\mathbf{\hat{u}}_{1}^{T}\mathbf{X}\mathbf{\hat{v}}_{1}$ and finally those coefficients that are not in the two sets of stable coefficients $\hat{S}_{\mathbf{u}_{1}}^{stable}$ and $\hat{S}_{\mathbf{v}_{1}}^{stable}$ are set to zero. So the components of $\hat{\mathbf{u}}_{1}$ become $\hat{u}_{1,i}=\mathbf{1}(i \in \hat{S}_{\mathbf{u}_{1}}^{stable})\hat{u}_{1,i}$ and the components of $\hat{\mathbf{v}}_{1}$ become $\hat{v}_{1,j}=\mathbf{1}(j \in \hat{S}_{\mathbf{v}_{1}}^{stable}  )\hat{v}_{1,j}$, where $\mathbf{1}(\cdot)$ is an indicator function.
+The next sparse rank-one approximation can be obtained by subtracting the sparse SVD-layer and applying the S4VD method to the residual matrix. Alternatively non-overlapping biclusters can be detected by excluding either the rows or the columns (or both) that correspond to the non-zero coefficients in the singular vector pair and and apply the S4VD method to the submatrix. By incorporating the stability selection a stopping criterion can be defined. If in any iteration an estimated set of non-zero coefficients is an empty set, the sequential fitting of sparse rank-one layers will be interrupted.
+\newpage
+\hspace{-0.1cm} 
+\rule{14.75 cm}{1pt}
+
+\begin{bf}The S4VD Algorithm\end{bf}\\
+\hspace{-0.1cm} 
+\rule{14.75 cm}{1pt}
+\begin{enumerate}
+ \item Apply the standard SVD to $\mathbf{X}$. Let $\left\{ d_{1}, \mathbf{u}_{1}, \mathbf{v}_{1} \right\}$ denote the first SVD triplet. Choose the desired type-one errors $E(V_{\mathbf{v}_{1}})$ and $E(V_{\mathbf{u}_{1}})$ and the threshold $\pi_{thr}$.
+ \item Update:
+  \begin{enumerate}
+   \item For each $\lambda_{\mathbf{u}_{1}}$ draw subsamples $J^{*}$ and estimate $\hat{\Pi}_{i}^{\lambda_{\mathbf{u}_{1}}}$.
+	 Define $\Lambda_{\mathbf{u}_{1}}$ such that $q_{\Lambda_{\mathbf{u}_{1}}} \leq e_{\Lambda_{\mathbf{u}_{1}}}$ and estimate the set of non-zero coefficients
+	 $\hat{S}_{\mathbf{u}_{1}}^{stable}$.\\
+	 Set $\hat{\tilde{u}}_{1,i}=\textit{sign} \left\{(\mathbf{X}\mathbf{v}_{1})_{i} \right\} (|(\mathbf{X}\mathbf{v}_{1})_{i}|- \lambda^{min}_{\mathbf{u}_{1}}w_{1,i}/2)_{+} $ \\
+	 Let $\mathbf{\hat{\tilde{u}}_{1}}=(\hat{\tilde{u}}_{1,1},\cdots,\hat{\tilde{u}}_{1,p})^{T}$,
+	 $d_{1,\mathbf{u}_{1}}=\left\Vert \mathbf{\hat{\tilde{u}}_{1}} \right\Vert$, 
+	 and $\mathbf{\hat{u}_{1}} =\mathbf{\hat{\tilde{u}}}/d_{1,\mathbf{u_{1}}}$
+    \item 
+	 For each $\lambda_{\mathbf{v}_{1}}$ draw subsamples $I^{*}$ and estimate $\hat{\Pi}_{j}^{\lambda_{\mathbf{v}_{1}}}$.
+	 Define $\Lambda_{\mathbf{v}_{1}}$ such that $q_{\Lambda_{\mathbf{v}_{1}}} \leq e_{\Lambda_{\mathbf{v}_{1}}}$ and estimate
+	 the set of non-zero coefficients $\hat{S}_{\mathbf{v}_{1}}^{stable}$. \\
+	 Set $\hat{\tilde{v}}_{1,j}= \textit{sign}\left\{(\mathbf{X}^{T}\mathbf{\hat{u}}_{1})_{j}\right\}(|(\mathbf{X}^{T}\mathbf{\hat{u}}_{1})_{j}|-\lambda^{min}_{\mathbf{v}_{1}}w_{2,j}/2)_{+}$ \\
+	 Let $\mathbf{\hat{\tilde{v}}_{1}}=(\hat{\tilde{v}}_{1,1},\cdots,\hat{\tilde{v}}_{1,n})^{T}$,
+	 $d_{1,\mathbf{v}_{1}}=\left\Vert \mathbf{\hat{\tilde{v}}}_{1} \right\Vert$, 
+	 and $\mathbf{\hat{v}_{1}} =\mathbf{\hat{\tilde{v}}}/d_{1,\mathbf{v}_{1}}$
+   \item Set $\mathbf{v}_{1}=\mathbf{\hat{v}}_{1}$, $\mathbf{u}_{1}=\mathbf{\hat{u}}_{1}$ and repeat 2(a) and 2(b) until convergence.
+  \end{enumerate} 
+  \item After convergence set $\hat{d}_{1}=\mathbf{\hat{u}}_{1}^{T}\mathbf{X}\mathbf{\hat{v}}_{1}$. \\
+  The components of $\hat{\mathbf{u}}_{1}$ become $\hat{u}_{1,i}=\mathbf{1}(i \in \hat{S}_{\mathbf{u}_{1}}^{stable})\hat{u}_{1,i}$. \\
+  The components of $\hat{\mathbf{v}}_{1}$ become $\hat{v}_{1,j}=\mathbf{1}(j \in \hat{S}_{\mathbf{v}_{1}}^{stable})\hat{v}_{1,j}$. 
+ \item To obtain the next layer apply steps 1 to 3 to the residual matrix $\mathbf{X}-\hat{d}_{1}\mathbf{\hat{u}}_{1}\mathbf{\hat{v}}_{1}^{T}$. 
+ \item Stop steps 1 to 4 if either $\hat{S}_{\mathbf{v}_{1}}^{stable}=\emptyset$ or $\hat{S}_{\mathbf{u}_{1}}^{stable}=\emptyset$.
+\end{enumerate}
+\hspace{-0.1cm} 
+\rule{14.75 cm}{1pt}
+\\
+\\
+The subsampling steps of the stability selection makes the S4VD algorithm computationally very demanding. To reduce the computation time, we implemented the pointwise error control suggested by \citet{Meinshausen2010}. Details about the implementation of the S4VD algorithm are described in the supplementary material.
+
+\subsection{Pointwise error control}
+%The subsampling in each iteration for each $\lambda_{\mathbf{u}_{1}} \in \Lambda_{\mathbf{u}_{1}}$
+%\begin{bf}pointwise error control\end{bf}\\
+In each iteration of the proposed S4VD algorithm we perform two stability selections where for a stability selection the stability path is computed by subsampling for each possible penalization parameter. Thus the S4VD algorithm is computationally very demanding, especially for high dimensional data sets. To reduce the computation time, we implemented the pointwise error control suggested by \citet{Meinshausen2010}. 
+%Assuming $\hat{S}^{\lambda_{\mathbf{u}_{1}}}_{\mathbf{u}_{1}} \subseteq \hat{S}^{\lambda^{*}_{\mathbf{u}_{1}}}_{\mathbf{u}_{1}}$ for each $\lambda_{\mathbf{u}_{1}}\geq \lambda^{*}_{\mathbf{u}_{1}}$.
+Suppose we are interested in estimating $\mathbf{\hat{u}_{1}}$, we can define a single penalization parameter as penalization region $\Lambda_{\mathbf{u}_{1}} = \{ \lambda_{\mathbf{u}_{1}} \}$ and draw subsamples $J^{*}$ to calculate the average number of selected coefficients $q_{\Lambda_{\mathbf{u}_{1}}}$. Given this parameters  the stability selection threshold can be calculated:
+\begin{equation}
+\pi_{thr} = \frac{1}{2} \left( \frac{q_{\Lambda_{\mathbf{u}_{1}}}^2}{E(V_{\mathbf{u}_{1}})p} + 1\right) 
+\end{equation}
+We define a region for the threshold $[\pi_{thr}^{min},\pi_{thr}^{max}]$, e.g. [0.6,0.65], and implemented a simple search algorithm that seeks for a $\lambda_{\mathbf{u}_{1}}$ such that $\pi_{thr}^{min}\leq\pi_{thr}\leq\pi_{thr}^{max}$. So instead of calculating in each iteration the complete stability paths,  
+this simple algorithm can be applied to find appropriate penalization parameters. In addition the penalization parameter can be used as starting value in the next iteration. This two changes reduce the computation time of the S4VD algorithm remarkably. To illustrate the idea of the stability selection and the pointwise error control, Figure 1 shows an example of the stability paths of the rows and the columns that correspond to a bicluster.
+
+\begin{center}
+\begin{figure}[t]
+\includegraphics[width=150 mm]{./Bilder/stabpath.pdf}
+\caption{ Stability paths for the rows and the columns corresponding to a bicluster identified with the S4VD algorithm. The dashed colored lines correspond to the stability selection threshold according to the pointwise error control. The continuous colored lines represent the estimated set of stable rows and columns with respect to different type one-error levels. The blue horizontal line corresponds to a stability selection threshold of $0.7$.\label{fig:01} 
+}
+\end{figure}
+\end{center}
+
+\subsection{The s4vd R-package}
+
+\section{Simulation Study}
+\subsection{Validation indices}
+\subsubsection{Average relevance and recovery scores}
+Since a bicluster is defined by its row and column subsets, we apply the Jaccard index to the Cartesian product of the sets of row and column indices.
+If $I^{G_{1}}$ and $J^{G_{1}}$ are the subsets of row and column indices that define the first bicluster $G_{1}$ and $I^{G_{2}}$ and $J^{G_{2}}$ are respective subsets according to the second bicluster $G_{2}$, then the Jaccard index measuring the agreement between those two biclusters is:
+\[
+Jac(G_{1},G_{2}) = \frac{( I^{G_{1}} \times J^{G_{1}}) \cup (I^{G_{2}}\times J^{G_{2}}) }{ (I^{G_{1}} \times J^{G_{1}}) \cap (I^{G_{2}} \times J^{G_{2}}) }
+\]
+Suppose we have a biclustering result that corresponds to a set of biclusters $\mathbf{G}=\{G_{1},\cdots,G_{L}\}$ with indices $l=1,\cdots,L$ and we aim to compare this with a second biclustering result $\mathbf{F}=\{F_{1},\cdots,F_{M}\}$ with indices $m=1,\cdots,M$. We can summarize the pairwise Jaccard indices between these two bicluster sets with a match score:
+\begin{equation} 
+M(\mathbf{G},\mathbf{F}) = \frac{1}{L} \sum_{l=1}^{L} \max_{F_{m} \in \mathbf{F}}  Jac(G_{l},F_{m})
+\end{equation}
+If $\mathbf{G}$ is a bicluster set proposed by any biclustering algorithm and $\mathbf{F}$ is the artificial set of bicluster present in the data matrix, then $M(\mathbf{G},\mathbf{F})$ measures the average relevance of the proposed biclusters with respect to the maximal Jaccard index between these biclusters and the artificial biclusters. On the contrary, $M(\mathbf{F},\mathbf{G})$ measures the average recovery of the artificial biclusters by the proposed bicluster set. 
+
+\subsubsection{Average proportions of falsely assigned rows and columns}
+If $\mathbf{F}=\{F_{1},\cdots,F_{M}\}$ is the artificial set of biclusters in the data and $\mathbf{G}=\{G_{1},\cdots,G_{L}\}$ is the bicluster set proposed by any biclustering algorithm, then the average number of falsely selected rows by this biclustering algorithm is:
+\begin{equation}
+V_{I}(\mathbf{G},\mathbf{F}) = \frac{1}{L} \sum_{l=1}^{L} \min_{F_{m} \in \mathbf{F}} |I^{G_{l}} \notin I^{F_{m}}|
+\end{equation}
+and the average number of falsely selected columns is:
+\begin{equation}
+V_{J}(\mathbf{G},\mathbf{F}) = \frac{1}{L} \sum_{l=1}^{L} \min_{F_{m} \in \mathbf{F}} |J^{G_{l}} \notin J^{F_{m}}|
+\end{equation}
+Then the average proportion of falsely assigned rows and columns are $V_{I}(\mathbf{G},\mathbf{F})/p$ and $V_{J}(\mathbf{G},\mathbf{F})/n$, respectively.
+
+\subsection{Selected algorithms}
+\subsubsection{The Plaid Model}
+The Plaid Model is a statistically inspired modeling approach first proposed by Lazzeroni and Owen (2002). Assuming that the underlying data structure can be modeled as a summation of $K$ possibly overlapping layers with indices $k=1,\cdots,K$ the model can be written as 
+\begin{equation}
+\mathbf{X} \approx \theta_{0} \sum_{k=1}^{K} \theta_{k} \rho_{i,k} \kappa_{j,k} + \epsilon_{ij}.
+\end{equation}
+where $\rho_{i,k}=1$ if the $i$th row belongs to the $k$th cluster and is zero otherwise, $\kappa_{j,k}=1$ if the $j$th column belongs to the $k$th layer.
+$\theta_{0}$ is the background effect of the complete data matrix, $\theta_{k}$ is the layer effect and $\epsilon_{ij}$ is an error term. \\
+The Plaid Model is similar to a SVD with $d_{k}=\theta_{k}$, $\mathbf{u}_{k}=\rho_{i,k}$ and $\mathbf{v}_{k}^{T}=\kappa_{j,k}$. In contrast to the a regular SVD the layers of the Plaid Model are not restricted to be orthogonal, but $\rho_{i,k}$ and $\kappa_{j,k}$ are restricted to have values in $\{0,1\}$.\\
+In general the $\theta_{k}$s can be extended to have the form $\theta_{k}=\mu_{k}+\alpha_{i,k}+\beta_{j,k}$, where $\mu_{k}$ is the mean effect of the $k$th layer and 
+$\alpha_{i,k}$ and $\beta_{j,k}$ are the row and column effects, respectively. In this case each layer corresponds to a two-way ANOVA model.
+The algorithm first models the background layer and then sequentially fits each individual layer. This process stops if the prespecified number of layers $K$ is reached or if any fitted layer is not significant, which is determined by a permutation test. The original algorithm updates the cluster membership parameters $\rho_{i,k}$ and $\kappa_{j,k}$ using alternating ordinary least squares (OLS). With each iteration the resulting non binary estimates $\hat{\rho}_{i,k}$ and $\hat{\kappa}_{j,k}$ are shifted gradually towards binary solutions. Turner et al. (2005) proposed to improve the original Plaid Model algorithm by using binary least squares, so that throughout the fitting process $\hat{\rho}_{i,k}$ and $\hat{\kappa}_{j,k}$ are restricted to have binary values. The improved Plaid Model algorithm showed a better performance regarding the relevance and the recovery of biclusters and in the computation time. An implementation of the improved Plaid Model of Turner et al. (2005) can be found in the R-package \textit{biclust} (Kaiser et al., 2008). The parameter settings used in the simulation study are displayed in Table 1.   
+
+\subsubsection{The Iterative Signature Algorithm (ISA)}
+The ISA performs an iterative heuristic search for biclusters for which the expression values of the corresponding genes are most similar over the conditions and vice versa. As input data the algorithm employs two normalized forms of the data matrix. Where the first matrix $\mathbf{X}_{G}$ has been standardized with respect to the rows and second matrix $\mathbf{X}_{C}$ has been standardized with respect to the columns. In addition an arbitrary gene threshold $g_{thr}$ and condition threshold $c_{thr}$ and a binary starting vector that represents the genes $\mathbf{g}$ are needed.
+The algorithm scores the conditions by the linear transformation $\mathbf{X}_{G}\mathbf{g}$ and identifies those conditions that have a higher score than the condition threshold. Given the resulting scored condition vector $\mathbf{c}$, genes that have a higher score than the gene threshold are identified. In this case the scores are according to the linear transformation $\mathbf{X}_{C}^{T}\mathbf{c}$. These two steps are alternated until between any two iterations the set of identified genes does not change. According to Bergmann et al. (2003) the ISA is a generalization of the SVD and will give similar results when applied without the thresholds.
+For the simulation study we used the implementation of the ISA algorithm available in the R-package \textit{isa2} (Csardi, 2010). In addition, prior to calculating the validation indices we excluded any non-robust or non-unique biclusters by applying the additional filtering functions available in this R-package.  
+
+\section{Evaluation of example data sets}
+\subsection{Lung cancer data set}
+Here we analyzed the same subset of the lung cancer gene expression data set (Bhattacharyee et al., 2001) that was used by Lee et al. (2010) to illustrate the SSVD algorithm. This data set contain $56$ samples and gene expression values of $12\,625$ genes measured using the Affymetrix 95av2 GeneChip. The samples comprise $20$ pulmonary carcinoid samples (Carcinoid), $13$ colon cancer metastasis samples (Colon), $17$ normal lung samples (Normal) and $6$ small cell lung carcinoma samples (SmallCell). Lee et al. (2010) applied the SSVD method to this gene expression matrix and decomposed it into the first three sparse SVD-layers. For each of the resulting SVD-layers the \textit{degree of sparsity} was relatively low, e.g. all singular vectors that correspond to the samples contained no non-zero coefficients and the singular vectors that correspond to the genes contained $3\,205$, $2\,511$ and $1\,221$ non-zero coefficients. Scatterplots of the sample singular vectors showed a clear grouping of the samples into the different cancer subtypes. In addition, Lee et al. (2010) formed $27$ gene sets according to the sign of the coefficients in the three gene singular vectors. The mean expression profiles of these gene sets showed clear differences between the cancer subtypes. However, despite these results a direct interpretation of each singular vector pair is not possible. 
+To obtain SVD-layers with a higher $\textit{degree of sparsity}$ that can be interpreted as single biclusters, we applied the S4VD algorithm controlling a PCER of $0.5$ for falsely selecting coefficients in the sample singular vector and a PCER of $0.01$ for falsely selecting coefficients in the gene singular vector. Furthermore, our interest lies in clusters that correspond to the distinct subclasses which show no overlap with regard to the samples, e.g. each sample is assigned to only one bicluster. Therefore, after a sparse SVD-layer is fitted, we exclude the corresponding columns from the data matrix and applied the S4VD algorithm to the resulting submatrix.
+\subsection{Ependymoma data set}
+\subsection{Protein array data set}
+\subsection{Gene Set Enrichment Analysis}
+To examine whether the genes corresponding to a bicluster reflect genes that belong to the similar functional groups, we conducted a gene set enrichment analysis.
+To this end, Fisher's exact test was applied to test the association of the bicluster gene sets with Gene Ontology (GO) terms of the biological process Ontology.
+Moreover, we used the capabilities of the R-package \textit{topGO} (Alexa, 2006) to perform the testing and to correct the resulting p-values for the directed acyclic graph (DAG) structure of the Ontology. Therefore we applied the so called \textit{elim} algorithm that takes the structure of the DAG into account, by removing all genes that are annotated to a significantly enriched child node from all its ancestor nodes. 
+
+\section{Interactive Graphics}
+\subsection{SEURAT}
+
+

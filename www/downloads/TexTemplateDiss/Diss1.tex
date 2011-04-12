@@ -1,0 +1,42 @@
+\documentclass[12pt,twoside,a4paper]{report}
+\usepackage{paperstyle1}
+\pagestyle{headings}
+\usepackage{namedScHumEngl}% um nach Schum in Englisch zu zitieren
+%***************
+\begin{document}
+\include{tex/Titelseite}
+\include{tex/Seite2}
+\pagenumbering{roman}\setcounter{page}{1}
+\setcounter{page}{1}
+%\setcounter{tocdepth}{3}
+\markright{Content}
+\tableofcontents
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
+\markboth{List of Tables}{List of Tables}
+\listoffigures 
+\addcontentsline{toc}{chapter}{List of Figures}
+\markboth{List of Figures}{List of Figures}
+\include{tex/Abkuerzungen}
+\pagenumbering{arabic}\setcounter{page}{1}
+% Einleitung
+\include{tex/Einleitung}
+\include{tex/Fragestellung}
+% Material und Methods
+\include{tex/MM}
+% Results 
+\include{tex/results}
+% Discussion
+\include{tex/Diskussion}
+% Zusammenfassung
+\include{tex/Zusammenfassung}
+\bibliography{diss}
+\bibliographystyle{ScHumEngl}
+\addcontentsline{toc}{chapter}{References}
+\include{tex/Eigenbib}
+% Appendix
+\include{tex/appendix}
+\include{tex/Lebenslauf}
+\include{tex/Danksagung}
+\end{document}
+

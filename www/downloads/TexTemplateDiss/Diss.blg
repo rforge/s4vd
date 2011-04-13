@@ -1,72 +1,48 @@
 This is BibTeX, Version 0.99c (TeX Live 2009/Debian)
 The top-level auxiliary file: Diss.aux
-A level-1 auxiliary file: tex/Titelseite.aux
-A level-1 auxiliary file: tex/Seite2.aux
-A level-1 auxiliary file: tex/Einleitung.aux
-A level-1 auxiliary file: tex/Fragestellung.aux
 A level-1 auxiliary file: tex/MM.aux
-A level-1 auxiliary file: tex/results.aux
-A level-1 auxiliary file: tex/Diskussion.aux
-A level-1 auxiliary file: tex/Zusammenfassung.aux
 The style file: ScHumEngl.bst
-A level-1 auxiliary file: tex/Eigenbib.aux
-A level-1 auxiliary file: tex/Lebenslauf.aux
-A level-1 auxiliary file: tex/Danksagung.aux
 Database file #1: diss.bib
 Warning--I didn't find a database entry for "Tib1996"
-Name 2 in "Cheng, Y. and Church G. M.," has a comma at the end for entry Cheng2000
-while executing---line 2549 of file ScHumEngl.bst
-Name 2 in "Cheng, Y. and Church G. M.," has a comma at the end for entry Cheng2000
-while executing---line 2549 of file ScHumEngl.bst
-Name 2 in "Cheng, Y. and Church G. M.," has a comma at the end for entry Cheng2000
-while executing---line 2549 of file ScHumEngl.bst
-Name 2 in "Cheng, Y. and Church G. M.," has a comma at the end for entry Cheng2000
-while executing---line 2653 of file ScHumEngl.bst
-Name 2 in "Cheng, Y. and Church G. M.," has a comma at the end for entry Cheng2000
-while executing---line 2653 of file ScHumEngl.bst
-Name 2 in "Cheng, Y. and Church G. M.," has a comma at the end for entry Cheng2000
-while executing---line 2681 of file ScHumEngl.bst
-Name 2 in "Cheng, Y. and Church G. M.," has a comma at the end for entry Cheng2000
-while executing---line 2681 of file ScHumEngl.bst
-You've used 30 entries,
+You've used 10 entries,
             2520 wiz_defined-function locations,
-            812 strings with 12053 characters,
-and the built_in function-call counts, 37847 in all, are:
-= -- 3623
-> -- 1126
+            634 strings with 5935 characters,
+and the built_in function-call counts, 10730 in all, are:
+= -- 1033
+> -- 278
 < -- 0
-+ -- 388
-- -- 358
-* -- 3398
-:= -- 5128
-add.period$ -- 32
-call.type$ -- 30
-change.case$ -- 219
-chr.to.int$ -- 30
-cite$ -- 90
-duplicate$ -- 3223
-empty$ -- 3448
-format.name$ -- 436
-if$ -- 8003
++ -- 98
+- -- 88
+* -- 954
+:= -- 1484
+add.period$ -- 10
+call.type$ -- 10
+change.case$ -- 57
+chr.to.int$ -- 10
+cite$ -- 30
+duplicate$ -- 921
+empty$ -- 999
+format.name$ -- 109
+if$ -- 2251
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 307
-newline$ -- 124
-num.names$ -- 120
-pop$ -- 643
+missing$ -- 87
+newline$ -- 44
+num.names$ -- 40
+pop$ -- 165
 preamble$ -- 1
-purify$ -- 183
+purify$ -- 47
 quote$ -- 0
-skip$ -- 542
+skip$ -- 149
 stack$ -- 0
-substring$ -- 4722
-swap$ -- 674
+substring$ -- 1354
+swap$ -- 190
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 270
+type$ -- 90
 warning$ -- 0
-while$ -- 330
+while$ -- 96
 width$ -- 0
-write$ -- 397
-(There were 7 error messages)
+write$ -- 133
+(There was 1 warning)

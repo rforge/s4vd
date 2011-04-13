@@ -1,45 +1,9 @@
-\begin{thebibliography}{30}
+\begin{thebibliography}{10}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
-
-\bibitem[\protect\citeauthoryear{Ben-Dor et~al.}{2003}]{BenDor2003}
-Ben-Dor A, Chor B, Karp R, Yakhini Z (2003) Discovering local structure in gene
-  expression data: The {Order-Preserving} submatrix problem.
-\newblock Journal of Computational Biology 10: 373--384
-
-\bibitem[\protect\citeauthoryear{Bergmann et~al.}{2003}]{Bergmann2003}
-Bergmann S, Ihmels J, Barkai N (2003) Iterative signature algorithm for the
-  analysis of large-scale gene expression data.
-\newblock Phys Rev E Stat Nonlin Soft Matter Phys 67: 031902
-
-\bibitem[\protect\citeauthoryear{Bhattacharjee
-  et~al.}{2001}]{Bhattacharjee2001}
-Bhattacharjee A, Richards WG, Staunton J, Li C, Monti S, Vasa P, Ladd C,
-  Beheshti J, Bueno R, Gillette M, Loda M, Weber G, Mark EJ, Lander ES, Wong W,
-  Johnson BE, Golub TR, Sugarbaker DJ, Meyerson M (2001) Classification of
-  human lung carcinomas by {mRNA} expression profiling reveals distinct
-  adenocarcinoma subclasses.
-\newblock Proceedings of the National Academy of Sciences of the United States
-  of America 98: 13790--13795
-
-\bibitem[\protect\citeauthoryear{Bhattacharya and
-  K~De}{2009}]{Bhattacharya2009}
-Bhattacharya A, K~De R (2009) Bi-correlation clustering algorithm for
-  determining a set of co-regulated genes.
-\newblock Bioinformatics 25: 2795--2801
 
 \bibitem[\protect\citeauthoryear{Busygin et~al.}{2008}]{Busygin2008}
 Busygin S, Prokopyev O, Pardalos PM (2008) Biclustering in data mining.
 \newblock Comput Oper Res 35: 2964--2987
-
-\bibitem[\protect\citeauthoryear{Carmona-Saez et~al.}{2006}]{Carmona-Saez2006}
-Carmona-Saez P, Pascual-Marqui R, Tirado F, Carazo J, Pascual-Montano A (2006)
-  Biclustering of gene expression data by non-smooth non-negative matrix
-  factorization.
-\newblock BMC Bioinformatics 7: 78
-
-\bibitem[\protect\citeauthoryear{Cheng and M.}{2000}]{Cheng2000}
-Cheng Y, M CG (2000) Biclustering of expression data.
-\newblock Proc Int Conf Intell Syst Mol Biol 8: 93--103
 
 \bibitem[\protect\citeauthoryear{Dudoit et~al.}{2003}]{Dudoit2003}
 Dudoit S, Shaffer JP, Boldrick JC (2003) Multiple hypothesis testing in
@@ -51,36 +15,11 @@ Eckart C, Young G (1936) The approximation of one matrix by another of lower
   rank.
 \newblock Psychometrika 1: 211--218
 
-\bibitem[\protect\citeauthoryear{Getz et~al.}{2000}]{Getz2000}
-Getz G, Levine E, Domany E (2000) Coupled two-way clustering analysis of gene
-  microarray data.
-\newblock Proc Natl Acad Sci U S A 97: 12079--12084
-
 \bibitem[\protect\citeauthoryear{Gribov et~al.}{2010}]{Gribov2010}
 Gribov A, Sill M, L?ck S, R?cker F, D?hner K, Bullinger L, Benner A, Unwin A
   (2010) Seurat: visual analytics for the integrated analysis of microarray
   data.
 \newblock BMC Med Genomics 3: 21
-
-\bibitem[\protect\citeauthoryear{Hartigan}{1972}]{Hartigan1972}
-Hartigan JA (1972) Direct clustering of a data matrix.
-\newblock Journal of the American Statistical Association 67: 123--129
-
-\bibitem[\protect\citeauthoryear{Hochreiter et~al.}{2010}]{Hochreiter2010}
-Hochreiter S, Bodenhofer U, Heusel M, Mayr A, Mitterecker A, Kasim A,
-  Khamiakova T, Van~Sanden S, Lin D, Talloen W, Bijnens L, G\"ohlmann H, Shkedy
-  Z, Clevert D (2010) Fabia: factor analysis for bicluster acquisition.
-\newblock Bioinformatics 26: 1520--1527
-
-\bibitem[\protect\citeauthoryear{Kasif et~al.}{2003}]{Kasif2003}
-Kasif S, Murali TM, Murali TM, Kasif S (2003) Extracting conserved gene
-  expression motifs from gene expression data.
-\newblock In: Pac. Symp. Biocomput, 77--88
-
-\bibitem[\protect\citeauthoryear{Kluger et~al.}{2003}]{Kluger2003}
-Kluger Y, Basri R, Chang JT, Gerstein M (2003) Spectral biclustering of
-  microarray data: coclustering genes and conditions.
-\newblock Genome Res 13: 703--716
 
 \bibitem[\protect\citeauthoryear{Lazzeroni and Owen}{2000}]{Lazzeroni2000}
 Lazzeroni L, Owen A (2000) Plaid models for gene expression data.
@@ -91,71 +30,20 @@ Lee M, Shen H, Huang JZ, Marron JS (2010) Biclustering via sparse singular
   value decomposition.
 \newblock Biometrics 66: 1087--1095
 
-\bibitem[\protect\citeauthoryear{Madeira and Oliveira}{2004}]{Madeira2004}
-Madeira SC, Oliveira AL (2004) Biclustering algorithms for biological data
-  analysis: A survey.
-\newblock IEEE/ACM Trans Comput Biol Bioinformatics 1: 24--45
-
-\bibitem[\protect\citeauthoryear{Mechelen et~al.}{2004}]{Mechelen2004}
-Mechelen IV, Bock HH, Boeck PD (2004) Two-mode clustering methods: a structured
-  overview.
-\newblock Stat Methods Med Res 13: 363--394
-
 \bibitem[\protect\citeauthoryear{Meinshausen and
   B\"{u}hlmann}{2010}]{Meinshausen2010}
 Meinshausen N, B\"{u}hlmann P (2010) Stability selection.
 \newblock Journal of the Royal Statistical Society: Series B (Statistical
   Methodology) 72: 417--473
 
-\bibitem[\protect\citeauthoryear{Monti et~al.}{2003}]{Monti2003}
-Monti S, Tamayo P, Mesirov J, Golub T (2003) Consensus clustering: A
-  {Resampling-Based} method for class discovery and visualization of gene
-  expression microarray data.
-\newblock Machine Learning 52: 91--118
-
-\bibitem[\protect\citeauthoryear{Prelic et~al.}{2006}]{Prelic2006}
-Prelic A, Bleuler S, Zimmermann P, Wille A, B?hlmann P, Gruissem W, Hennig L,
-  Thiele L, Zitzler E (2006) A systematic comparison and evaluation of
-  biclustering methods for gene expression data.
-\newblock Bioinformatics 22: 1122--1129
-
-\bibitem[\protect\citeauthoryear{Santamar\'{\i}a et~al.}{2007}]{Santamaria2007}
-Santamar\'{\i}a R, Quintales L, Ther\'{o}n R (2007) Methods to bicluster
-  validation and comparison in microarray data.
-\newblock In: Proceedings of the 8th international conference on Intelligent
-  data engineering and automated learning, IDEAL'07, 780--789. Springer-Verlag,
-  Berlin, Heidelberg
-
 \bibitem[\protect\citeauthoryear{Schwarz}{1978}]{Schwarz1978}
 Schwarz G (1978) Estimating the dimension of a model.
 \newblock The Annals of Statistics 6: 461--464
-
-\bibitem[\protect\citeauthoryear{Suzuki and Shimodaira}{2006}]{Suzuki2006}
-Suzuki R, Shimodaira H (2006) Pvclust: an r package for assessing the
-  uncertainty in hierarchical clustering.
-\newblock Bioinformatics 22: 1540--1542
-
-\bibitem[\protect\citeauthoryear{Tanay et~al.}{2004}]{Tanay2004}
-Tanay A, Sharan R, Kupiec M, Shamir R (2004) Revealing modularity and
-  organization in the yeast molecular network by integrated analysis of highly
-  heterogeneous genomewide data.
-\newblock Proceedings of the National Academy of Sciences of the United States
-  of America 101: 2981--2986
 
 \bibitem[\protect\citeauthoryear{Tibshirani}{1996}]{Tibshirani1996}
 Tibshirani R (1996) Regression shrinkage and selection via the lasso.
 \newblock Journal of the Royal Statistical Society Series B (Methodological)
   58: 267--288
-
-\bibitem[\protect\citeauthoryear{Turner et~al.}{2005}]{Turner2005}
-Turner HL, Bailey TC, Krzanowski WJ, Hemingway CA (2005) Biclustering models
-  for structured microarray data.
-\newblock IEEE/ACM Trans Comput Biol Bioinform 2: 316--329
-
-\bibitem[\protect\citeauthoryear{Yang et~al.}{2003}]{Yang2003}
-Yang J, Wang H, Wang W, Yu P (2003) Enhanced biclustering on expression data.
-\newblock In: Proceedings of the 3rd IEEE Symposium on BioInformatics and
-  BioEngineering, BIBE '03, 321--. IEEE Computer Society, Washington, DC, USA
 
 \bibitem[\protect\citeauthoryear{Zou}{2006}]{Zou2006}
 Zou H (2006) The adaptive lasso and its oracle properties.

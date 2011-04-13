@@ -144,7 +144,7 @@ In the SSVD algorithm the two regressions with the corresponding parameter tunin
 \end{enumerate}
 \hspace{-0.1cm} 
 \rule{14.75 cm}{1pt}\\
-In practice we observed that choosing the regularization parameters according to the BIC results in singular vector pairs with a relative low \textit{degree of sparsity}. In addition, the SSVD algorithm does not offer a stopping criterion and so the choice of the number of SVD-layers is arbitrary.
+\newpage
 
 \subsection{Stability Selection}
 In this thesis, we propose to choose the penalization parameters and to control the \textit{degree of sparsity} of the resulting SVD-layers using stability selection \cite{Meinshausen2010}. The idea of stability selection is to combine resampling with variable selection methods, e.g. penalized regression models. For each variable its probability of being selected is estimated by resampling the data and calculating relative frequencies of being selected. \citet{Meinshausen2010} provide a theoretical framework for controlling Type I error rates of falsely selecting variables based on the maximum of these selection probabilities over the range of regularization parameters. \\
@@ -176,7 +176,8 @@ E(V_{\mathbf{u}_{1}}) \leq \frac{1}{(2\pi_{thr}-1)} \frac{q^{2}_{\Lambda_{\mathb
 Interpreting equation (\ref{eq:15}) the expected number of falsely selected coefficients decreases by either reducing the average number of selected coefficients $q_{\Lambda_{\mathbf{u}_{1}}}$ or by increasing the threshold $\pi_{thr}$. Supposing that $\pi_{thr}$ is fixed the stability selection controls the desired error level of $E(V_{\mathbf{u}_{1}})$ as long as the average number of selected coefficients is less then $e_{\Lambda_{\mathbf{u}_{1}}}$, where $e_{\Lambda_{\mathbf{u}_{1}}} = \sqrt{E(V_{\mathbf{u}_{1}})p(2\pi_{thr}-1)}$ is an upper bound for the average number of selected coefficients that can be controlled by reducing the length of the regularization path $\Lambda_{\mathbf{u}_{1}}$. In multiple testing the expected number of falsely selected variables is also known as the per-family error rate (PFER) and if divided by the total number of the variables it will become the per-comparison error rate (PCER) \cite{Dudoit2003}. The stability selection allows to control these Type I error rates. 
 
 \subsection{The SSVD Algorithm with nested Stability Selection}
-Here we propose to replace the BIC based penalty parameter selection of the SSVD algorithm by the stability selection. 
+In practice we observed that choosing the regularization parameters according to the BIC results in singular vector pairs with a relative low \textit{degree of sparsity}. In addition, the SSVD algorithm does not offer a stopping criterion and so the choice of the number of SVD-layers is arbitrary.
+In this thesis we propose to replace the BIC based penalty parameter selection of the SSVD algorithm by the stability selection. 
 This combined approach allows to control the expected number of falsely selected non-zero coefficients in the singular vector pair and therefore the \textit{degree of sparsity} of the resulting SVD-layers. Furthermore, the error control also serves as stopping criterion for the improved SSVD algorithm and determines the number of reasonable layers. \\
 We aim to estimate the left singular vector $\mathbf{\hat{u}}_{1}$ and at the same time infer the true set of non-zero coefficients $S_{\mathbf{u}_{1}}$.
 For each possible $\lambda_{\mathbf{u}_{1}}$ we draw subsamples and estimate the selection probabilities $\hat{\Pi}_{i}^{\lambda_{\mathbf{u}_{1}}}$.
@@ -203,7 +204,11 @@ Given the smallest parameter of the penalization path $\lambda^{min}_{\mathbf{v}
 Finally let $\mathbf{\hat{\tilde{v}}_{1}}=(\hat{\tilde{v}}_{1,1},\cdots,\hat{\tilde{v}}_{1,n})^{T}$, the updated first singular value is $d_{1,\mathbf{v}_{1}}=\left\Vert\mathbf{\tilde{v}_{1}}\right\Vert$ and estimated sparse singular vector is $\mathbf{\hat{v}}=\mathbf{\hat{\tilde{v}}_{1}}/d_{1,\mathbf{v}_{1}}$. \\
 These two penalized regression models with the nested stability selection are alternated until convergence, e.g. that is if either $\left\Vert \mathbf{v}_{1} - \mathbf{\hat{v}}_{1}\right\Vert < \epsilon$ or $\left\Vert \mathbf{u}_{1} - \mathbf{\hat{u}}_{1} \right\Vert < \epsilon$, where $\epsilon > 0$.
 After convergence the estimated singular value is $\hat{d}_{1}=\mathbf{\hat{u}}_{1}^{T}\mathbf{X}\mathbf{\hat{v}}_{1}$ and finally those coefficients that are not in the two sets of stable coefficients $\hat{S}_{\mathbf{u}_{1}}^{stable}$ and $\hat{S}_{\mathbf{v}_{1}}^{stable}$ are set to zero. So the components of $\hat{\mathbf{u}}_{1}$ become $\hat{u}_{1,i}=\mathbf{1}(i \in \hat{S}_{\mathbf{u}_{1}}^{stable})\hat{u}_{1,i}$ and the components of $\hat{\mathbf{v}}_{1}$ become $\hat{v}_{1,j}=\mathbf{1}(j \in \hat{S}_{\mathbf{v}_{1}}^{stable}  )\hat{v}_{1,j}$, where $\mathbf{1}(\cdot)$ is an indicator function.
-The next sparse rank-one approximation can be obtained by subtracting the sparse SVD-layer and applying the S4VD method to the residual matrix. Alternatively non-overlapping biclusters can be detected by excluding either the rows or the columns (or both) that correspond to the non-zero coefficients in the singular vector pair and and apply the S4VD method to the submatrix. By incorporating the stability selection a stopping criterion can be defined. If in any iteration an estimated set of non-zero coefficients is an empty set, the sequential fitting of sparse rank-one layers will be interrupted.
+The high \textit{degree of sparsity} of the resulting SVD-layers may lead to a poor matrix factorization that might induce noise to the residual matrix when subtracted from the data matrix. Like for multivariate regression models, this can be seen as a trade-off between a high degree of sparsity and hence interpretability for the cost of losing prediction power. Regarding the sequential fitting procedure of the S4VD algorithm, the acceptance of a poor matrix approximation might induce noise into the residual matrix. This induced noise may perturb the fitting process for subsequent biclusters. In order to avoid a propagation of errors induced by a poor matrix approximation, we propose to apply the regular SVD to the submatrix defined by the stable subsets of rows and columns identified with the S4VD algorithm. According to Eckart and Young (1936) the rank-one SVD approximation of this submatrix is the best rank-one approximation of the submatrix with respect to the Frobenius norm. The next bicluster can be detected by subtracting this rank-one approximation of the submatrix from the corresponding submatrix of the input data matrix and applying the S4VD algorithm to the resulting residual matrix. 
+Alternatively non-overlapping biclusters can be detected by excluding either the rows or the columns (or both) that correspond to the non-zero coefficients in the singular vector pair and apply the S4VD method to the submatrix. By incorporating the stability selection a stopping criterion can be defined. If in any iteration an estimated set of non-zero coefficients is an empty set, the sequential fitting of sparse rank-one layers will be interrupted. 
+Due to the element of resampling the S4VD algorithm will not necessarily converge to the exact same result when applied to the same data set. However, the element of resampling also allows to take the bicluster stability into account by controlling the Type I error levels of falsely assigning rows and columns. Furthermore, the stability selection allows to formulate a stopping criterion.
+%As demonstrated by the simulations presented in the result section the S4VD algorithm shows a better performance in revealing the true bicluster structure and is more robust to noise.
+\\
 \newpage
 \hspace{-0.1cm} 
 \rule{14.75 cm}{1pt}
@@ -235,15 +240,16 @@ The next sparse rank-one approximation can be obtained by subtracting the sparse
   \item After convergence set $\hat{d}_{1}=\mathbf{\hat{u}}_{1}^{T}\mathbf{X}\mathbf{\hat{v}}_{1}$. \\
   The components of $\hat{\mathbf{u}}_{1}$ become $\hat{u}_{1,i}=\mathbf{1}(i \in \hat{S}_{\mathbf{u}_{1}}^{stable})\hat{u}_{1,i}$. \\
   The components of $\hat{\mathbf{v}}_{1}$ become $\hat{v}_{1,j}=\mathbf{1}(j \in \hat{S}_{\mathbf{v}_{1}}^{stable})\hat{v}_{1,j}$. 
- \item To obtain the next layer apply steps 1 to 3 to the residual matrix $\mathbf{X}-\hat{d}_{1}\mathbf{\hat{u}}_{1}\mathbf{\hat{v}}_{1}^{T}$. 
+ \item To obtain the next layer apply steps 1 to 3 to the residual matrix after subtracting the rank one approximation derived by applying a regular SVD to the submatrix defined by $\hat{S}_{\mathbf{u}_{1}}^{stable}$ and $\hat{S}_{\mathbf{v}_{1}}^{stable}$. \\
+ Alternatively, if interest lies in non-overlapping biclusters, exclude either the rows or the columns (or both) that correspond to $\hat{S}_{\mathbf{u}_{1}}^{stable}$ and $\hat{S}_{\mathbf{v}_{1}}^{stable}$ and apply the S4VD method to the submatrix.
+%$\mathbf{X}-\hat{d}_{1}\mathbf{\hat{u}}_{1}\mathbf{\hat{v}}_{1}^{T}$. 
  \item Stop steps 1 to 4 if either $\hat{S}_{\mathbf{v}_{1}}^{stable}=\emptyset$ or $\hat{S}_{\mathbf{u}_{1}}^{stable}=\emptyset$.
 \end{enumerate}
 \hspace{-0.1cm} 
 \rule{14.75 cm}{1pt}
-\\
-\\
-The subsampling steps of the stability selection makes the S4VD algorithm computationally very demanding. To reduce the computation time, we implemented the pointwise error control suggested by \citet{Meinshausen2010}. Details about the implementation of the S4VD algorithm are described in the supplementary material.
+\newpage
 
+%The subsampling steps of the stability selection makes the S4VD algorithm computationally very demanding. To reduce the computation time, we implemented the pointwise error control suggested by Meinshausen and B\"uhlmann (2010). To examine how the pointwise error control reduces the computation time the runtimes of the SSVD algorithm, of the S4VD algorithm and of the S4VD algorithm with the pointwise error control have been compared. In the first part of the simulation study described in the results section at a noise level of $0.5$ the mean runtime of the SSVD algorithm was $33.9$ seconds, for the S4VD it was $181.7$ seconds and for the S4VD with the pointwise error control it was $5.8$ seconds. The simulations have been carried out using a notebook with an Intel\textregistered Core\texttrademark2 Duo Processor T7700 2.4 GHz and 4 GB DDR2 SDRAM. Details about the pointwise error control and boxplots of the runtimes are shown in the supplementary material.
 \subsection{Pointwise error control}
 %The subsampling in each iteration for each $\lambda_{\mathbf{u}_{1}} \in \Lambda_{\mathbf{u}_{1}}$
 %\begin{bf}pointwise error control\end{bf}\\
@@ -254,15 +260,19 @@ Suppose we are interested in estimating $\mathbf{\hat{u}_{1}}$, we can define a 
 \pi_{thr} = \frac{1}{2} \left( \frac{q_{\Lambda_{\mathbf{u}_{1}}}^2}{E(V_{\mathbf{u}_{1}})p} + 1\right) 
 \end{equation}
 We define a region for the threshold $[\pi_{thr}^{min},\pi_{thr}^{max}]$, e.g. [0.6,0.65], and implemented a simple search algorithm that seeks for a $\lambda_{\mathbf{u}_{1}}$ such that $\pi_{thr}^{min}\leq\pi_{thr}\leq\pi_{thr}^{max}$. So instead of calculating in each iteration the complete stability paths,  
-this simple algorithm can be applied to find appropriate penalization parameters. In addition the penalization parameter can be used as starting value in the next iteration. This two changes reduce the computation time of the S4VD algorithm remarkably. To illustrate the idea of the stability selection and the pointwise error control, Figure 1 shows an example of the stability paths of the rows and the columns that correspond to a bicluster.
+this simple algorithm can be applied to find appropriate penalization parameters. In addition the penalization parameter can be used as starting value in the next iteration. This two changes reduce the computation time of the S4VD algorithm remarkably.
 
-\begin{center}
-\begin{figure}[t]
-\includegraphics[width=150 mm]{./Bilder/stabpath.pdf}
-\caption{ Stability paths for the rows and the columns corresponding to a bicluster identified with the S4VD algorithm. The dashed colored lines correspond to the stability selection threshold according to the pointwise error control. The continuous colored lines represent the estimated set of stable rows and columns with respect to different type one-error levels. The blue horizontal line corresponds to a stability selection threshold of $0.7$.\label{fig:01} 
-}
-\end{figure}
-\end{center}
+
+
+
+%To illustrate the idea of the stability selection and the pointwise error control, Figure 1 shows an example of the stability paths of the rows and the columns that correspond to a bicluster.
+%\begin{center}
+%\begin{figure}[t]
+%\includegraphics[width=150 mm]{./Bilder/stabpath.pdf}
+%\caption{ Stability paths for the rows and the columns corresponding to a bicluster identified with the S4VD algorithm. The dashed colored lines correspond to the stability selection threshold according to the pointwise error control. The continuous colored lines represent the estimated set of stable rows and columns with respect to different type one-error levels. The blue horizontal line corresponds to a stability selection threshold of $0.7$.\label{fig:01} 
+%}
+%\end{figure}
+%\end{center}
 
 \subsection{The s4vd R-package}
 

@@ -1,6 +1,11 @@
 import(biclust)
 import(irlba)
 import(foreach)
+import(methods)
+
+importFrom("graphics", "abline", "axis", "image", "layout", "legend",
+             "lines", "matplot", "par", "plot", "rect", "title")
+importFrom("stats", "quantile")
 
 export(	s4vd,
 		ssvd,

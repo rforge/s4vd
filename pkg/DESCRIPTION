@@ -10,4 +10,3 @@ Description: The package implements the S4VD and SSVD algorithm for biclustering
         singular value decomposition.
 License: GPL-2
 LazyLoad: yes
-

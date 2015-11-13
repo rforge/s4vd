@@ -6,7 +6,7 @@ Date: 2015-11-11
 Author: Martin Sill, Sebastian Kaiser
 Maintainer: Martin Sill <m.sill@dkfz.de>
 Depends: biclust,methods,irlba,foreach
-Description: The package implements the S4VD and SSVD algorithm for biclustering via sparse
-        singular value decomposition.
+Description: TBiclustering via sparse singular value decomposition (SSVD) and
+biclustering via sparse singular value decomposition with nested stability selection (S4VD).
 License: GPL-2
 LazyLoad: yes

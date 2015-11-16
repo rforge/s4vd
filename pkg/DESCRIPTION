@@ -6,7 +6,9 @@ Date: 2015-11-11
 Author: Martin Sill, Sebastian Kaiser
 Maintainer: Martin Sill <m.sill@dkfz.de>
 Depends: biclust,methods,irlba,foreach
-Description: Biclustering via sparse singular value decomposition (SSVD) and
-biclustering via sparse singular value decomposition with nested stability selection (S4VD).
+Description: The main function s4vd performs a biclustering via sparse
+        singular value decomposition with a nested stability selection.
+        The results is an biclust object and thus all methods of the
+        biclust package can be applied.
 License: GPL-2
 LazyLoad: yes

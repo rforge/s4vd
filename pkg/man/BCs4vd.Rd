@@ -110,7 +110,7 @@ Martin Sill, Sebastian Kaiser, Axel Benner and Annette Kopp-Schneider
 \seealso{ \code{\link{biclust}}, \code{\link{Biclust}}}
 
 \examples{
-
+\donttest{
 # example data set according to the simulation study in Lee et al. 2010
 # generate artifical data set and a correspondig biclust object
 u <- c(10,9,8,7,6,5,4,3,rep(2,17),rep(0,75))
@@ -138,6 +138,7 @@ resssvd <- biclust(X,BCssvd,K=1)
 jaccardind(ressim,ress4vd)
 jaccardind(ressim,ress4vdpw)
 jaccardind(ressim,resssvd)
+}
 }
 
 \keyword{biclustering}

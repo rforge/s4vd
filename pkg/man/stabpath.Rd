@@ -43,9 +43,9 @@ Martin Sill \
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 %\seealso{
-%kommt noch
 %}
 \examples{
+\donttest{
 # example data set according to the simulation study in Lee et al. 2010
 # generate artifical data set and a correspondig biclust object
 u <- c(10,9,8,7,6,5,4,3,rep(2,17),rep(0,75))
@@ -74,6 +74,7 @@ ress4vdpw <- biclust(X,method=BCs4vd,pcerv=0.5,
 stabpath(ress4vd,1)
 #selection probabilitys for the pointwise stability selection
 stabpath(ress4vdpw,1)
+}
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

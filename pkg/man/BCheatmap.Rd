@@ -68,6 +68,7 @@ Martin Sill \
 %kommt noch
 %}
 \examples{
+\donttest{
 #lung cancer data set   Bhattacharjee et al. 2001
 data(lung200)
 set.seed(12)
@@ -76,6 +77,6 @@ res1 <- biclust(lung200,method=BCs4vd(),pcerv=.5,pceru=0.01,ss.thr=c(0.6,0.65)
 ,merr=0.0001,iter=100,nbiclust=10,col.overlap=FALSE)
 BCheatmap(lung200,res1)
 }
-
+}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
